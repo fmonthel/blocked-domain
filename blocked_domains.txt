@@ -1,20 +1,292 @@
-.youtube.com
-.discord.com
-.azgames.io
-.crazygames.com
-.youporn.com
+# Squid blocklist (acl dstdomain). One entry per line.
+# ".example.com" blocks example.com and all its subdomains; "host.example.com" blocks only that host.
+# Lines starting with # are ignored by Squid. Avoid overlapping entries (a subdomain of an entry
+# already listed with a leading dot): Squid warns and ignores them.
+
+# ---------------------------------------------------------------------------
+# Adult content - whole top-level domains
+# ---------------------------------------------------------------------------
+.xxx
+.porn
+.sex
+.adult
+
+# ---------------------------------------------------------------------------
+# Adult content - tube sites
+# ---------------------------------------------------------------------------
 .pornhub.com
-play.google.com
-.shadowserver.org
-.proxypool.top
-.yandex.net
-.eaglex.ic.gov
-.skype.com
-.duckduckgo.com
-.tmw-defender.pro
-.pushtorm.net
+.youporn.com
+.xvideos.com
+.xvideos.red
+.xnxx.com
+.xhamster.com
+.xhamster.desi
+.xhamsterlive.com
+.redtube.com
+.tube8.com
+.thumbzilla.com
+.spankbang.com
+.eporner.com
+.beeg.com
+.tnaflix.com
+.empflix.com
+.porn.com
+.porntrex.com
+.txxx.com
+.hclips.com
+.hdzog.com
+.upornia.com
+.vjav.com
+.motherless.com
+.youjizz.com
+.sunporno.com
+.drtuber.com
+.nuvid.com
+.porndig.com
+.pornone.com
+.4tube.com
+.fux.com
+.porntube.com
+.pornerbros.com
+.ixxx.com
+.alohatube.com
+.erome.com
+.pornpics.com
+.imagefap.com
+.sex.com
+.literotica.com
+
+# ---------------------------------------------------------------------------
+# Adult content - webcams, paysites, creator platforms
+# ---------------------------------------------------------------------------
+.chaturbate.com
+.stripchat.com
+.bongacams.com
+.livejasmin.com
+.cam4.com
+.camsoda.com
+.myfreecams.com
+.flirt4free.com
+.imlive.com
+.streamate.com
+.jerkmate.com
+.onlyfans.com
+.fansly.com
+.manyvids.com
+.clips4sale.com
+.brazzers.com
+.realitykings.com
+.bangbros.com
+.naughtyamerica.com
+.mofos.com
+.digitalplayground.com
+.vixen.com
+.blacked.com
+.tushy.com
+.teamskeet.com
+.evilangel.com
+.kink.com
+.playboy.com
+.hustler.com
+.penthouse.com
+
+# ---------------------------------------------------------------------------
+# Adult content - hentai / drawn
+# ---------------------------------------------------------------------------
+.nhentai.net
+.hanime.tv
+.e-hentai.org
+.exhentai.org
+.hentai2read.com
+.gelbooru.com
+.rule34.paheal.net
+.e621.net
+.f95zone.to
+
+# ---------------------------------------------------------------------------
+# Adult dating / hookup
+# ---------------------------------------------------------------------------
+.adultfriendfinder.com
+.ashleymadison.com
+.fetlife.com
+.tinder.com
+.gotinder.com
+.bumble.com
+.grindr.com
+.badoo.com
+
+# ---------------------------------------------------------------------------
+# Video platforms
+# ---------------------------------------------------------------------------
+.youtube.com
+.youtu.be
+.youtube-nocookie.com
+.youtubekids.com
+.googlevideo.com
+.ytimg.com
+youtubei.googleapis.com
 .tiktok.com
-chromewebstore.google.com
+.tiktokcdn.com
+.tiktokcdn-us.com
+.tiktokv.com
+.tiktokv.us
+.tiktokw.us
+.byteoversea.com
+.ibytedtos.com
+.ibyteimg.com
+.musical.ly
+.dailymotion.com
+.dmcdn.net
+.dai.ly
+.vimeo.com
+.vimeocdn.com
+.twitch.tv
+.ttvnw.net
+.jtvnw.net
+.kick.com
+.rumble.com
+.bitchute.com
+.odysee.com
+.bilibili.com
+.bilibili.tv
+.nicovideo.jp
+.9gag.com
+.likee.video
+.triller.co
+.veoh.com
+.streamable.com
+.coub.com
+
+# ---------------------------------------------------------------------------
+# Streaming services (remove this section to allow them)
+# ---------------------------------------------------------------------------
+.netflix.com
+.nflxvideo.net
+.nflximg.net
+.nflxso.net
+.disneyplus.com
+.disney-plus.net
+.bamgrid.com
+.primevideo.com
+.aiv-cdn.net
+.crave.ca
+.tou.tv
+.crunchyroll.com
+.hulu.com
+.max.com
+.hbomax.com
+.paramountplus.com
+.peacocktv.com
+.tubitv.com
+.pluto.tv
+
+# ---------------------------------------------------------------------------
+# Social networks
+# ---------------------------------------------------------------------------
+.facebook.com
+.facebook.net
+.fb.com
+.fb.me
+.fbcdn.net
+.messenger.com
+.instagram.com
+.cdninstagram.com
+.ig.me
+.threads.net
+.threads.com
+.twitter.com
+.x.com
+.twimg.com
+.t.co
+.snapchat.com
+.snap.com
+.sc-cdn.net
+.snapkit.com
+.reddit.com
+.redd.it
+.redditmedia.com
+.redditstatic.com
+.reddituploads.com
+.pinterest.com
+.pinimg.com
+.pin.it
+.tumblr.com
+.bsky.app
+.bsky.social
+.mastodon.social
+.truthsocial.com
+.gab.com
+.vk.com
+.ok.ru
+.lemon8-app.com
+.bereal.com
+.bere.al
+.discord.com
+.discord.gg
+.discordapp.com
+.discordapp.net
+.discord.media
+.telegram.org
+.telegram.me
+.t.me
+.kik.com
+.4chan.org
+.4channel.org
+.4cdn.org
+
+# ---------------------------------------------------------------------------
+# Random chat / anonymous Q&A
+# ---------------------------------------------------------------------------
+.ome.tv
+.chatroulette.com
+.chatrandom.com
+.emeraldchat.com
+.yubo.live
+.tellonym.me
+.ask.fm
+.whisper.sh
+
+# ---------------------------------------------------------------------------
+# VPN services
+# ---------------------------------------------------------------------------
+.nordvpn.com
+.nordvpn.net
+.expressvpn.com
+.surfshark.com
+.protonvpn.com
+.protonvpn.net
+.cyberghostvpn.com
+.privateinternetaccess.com
+.ipvanish.com
+.windscribe.com
+.tunnelbear.com
+.hotspotshield.com
+.mullvad.net
+.zenmate.com
+.hide.me
+.hidemyass.com
+.vyprvpn.com
+.strongvpn.com
+.privadovpn.com
+.atlasvpn.com
+.urban-vpn.com
+.setupvpn.com
+.betternet.co
+.vpnbook.com
+.zoogvpn.com
+.x-vpn.com
+.keepsolid.com
+.speedify.com
+.hoxx.com
+.touchvpn.net
+.astrill.com
+.ivpn.net
+.airvpn.org
+.torguard.net
+.goosevpn.com
+.fastestvpn.com
+.privatevpn.com
+.purevpn.com
 .veepn.com
 .freevpnplanet.com
 .1vpn.org
@@ -22,8 +294,56 @@ chromewebstore.google.com
 .dotvpn.com
 .1clickvpn.net
 .turbovpn.com
-.purevpn.com
 .adguard-vpn.com
 .browsec.com
-.expressvpn.com
-.surfshark.com
+.cloudflareclient.com
+.psiphon.ca
+.psiphon3.com
+.getlantern.org
+.lantern.io
+.ultrasurf.us
+.torproject.org
+
+# ---------------------------------------------------------------------------
+# Web proxies / filter bypass
+# ---------------------------------------------------------------------------
+.croxyproxy.com
+.croxyproxy.rocks
+.croxy.network
+.proxysite.com
+.kproxy.com
+.4everproxy.com
+.hidemy.name
+.hidester.com
+.proxyium.com
+.blockaway.net
+.proxfree.com
+.filterbypass.me
+.whoer.net
+.genmirror.com
+.translate.goog
+.proxypool.top
+
+# ---------------------------------------------------------------------------
+# Extension / app stores (VPN extensions and apps)
+# ---------------------------------------------------------------------------
+play.google.com
+chromewebstore.google.com
+addons.mozilla.org
+
+# ---------------------------------------------------------------------------
+# Games
+# ---------------------------------------------------------------------------
+.azgames.io
+.crazygames.com
+
+# ---------------------------------------------------------------------------
+# Other (from previous list)
+# ---------------------------------------------------------------------------
+.duckduckgo.com
+.skype.com
+.yandex.net
+.shadowserver.org
+.eaglex.ic.gov
+.tmw-defender.pro
+.pushtorm.net

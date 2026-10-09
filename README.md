@@ -26,59 +26,10 @@ Les règles sont testées dans cet ordre : la première qui correspond s'appliqu
 Créer le dossier `%LOCALAPPDATA%\ProxySwitch\` et y enregistrer le fichier `Switch-Proxy.ps1` :
 
 ```powershell
-New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\ProxySwitch"
-```
-
-**`Switch-Proxy.ps1`**
-
-```powershell
-# Switch-Proxy.ps1 : choisit le proxy selon le réseau Wi-Fi
-$ProxyDefaut = 'nk-h2k4g2.flox-arts.net:8443'
-$ProxyFlox   = '192.168.18.245:3128'
-$RegPath     = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
-$Log         = Join-Path $PSScriptRoot 'switch-proxy.log'
-
-Start-Sleep -Seconds 3   # laisse la connexion se stabiliser
-
-# Profil WLAN actif + SSID
-$infos  = netsh wlan show interfaces
-$profil = ($infos | Select-String '^\s+Profile?\s+:\s+(.+)$' | Select-Object -First 1).Matches.Groups[1].Value
-$ssid   = ($infos | Select-String '^\s+SSID\s+:\s+(.+)$'     | Select-Object -First 1).Matches.Groups[1].Value
-
-# Repli si netsh ne répond pas (localisation désactivée, Ethernet…)
-if (-not $profil) {
-    $profil = (Get-NetConnectionProfile | Select-Object -ExpandProperty Name) -join ', '
-}
-
-function Set-Proxy($Serveur) {
-    if ($Serveur) {
-        Set-ItemProperty $RegPath -Name ProxyServer -Value $Serveur
-        Set-ItemProperty $RegPath -Name ProxyEnable -Value 1
-    } else {
-        Set-ItemProperty $RegPath -Name ProxyEnable -Value 0
-    }
-}
-
-# Règles, testées dans l'ordre
-if ($profil -like '*WCDM*') {
-    Set-Proxy $null
-    $action = 'proxy DÉSACTIVÉ'
-}
-elseif ($profil -eq 'Flox-arts.net' -or $ssid -eq 'Flox-arts.net') {
-    Set-Proxy $ProxyFlox
-    $action = "proxy Flox-arts : $ProxyFlox"
-}
-else {
-    Set-Proxy $ProxyDefaut
-    $action = "proxy FORCÉ : $ProxyDefaut"
-}
-
-# Prévient Windows que les réglages ont changé
-Add-Type -Namespace Win -Name WinInet -MemberDefinition '[DllImport("wininet.dll")] public static extern bool InternetSetOption(IntPtr h, int o, IntPtr b, int l);'
-[Win.WinInet]::InternetSetOption([IntPtr]::Zero, 39, [IntPtr]::Zero, 0) | Out-Null   # SETTINGS_CHANGED
-[Win.WinInet]::InternetSetOption([IntPtr]::Zero, 37, [IntPtr]::Zero, 0) | Out-Null   # REFRESH
-
-"$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  SSID='$ssid'  Profil='$profil'  ->  $action" | Add-Content $Log
+New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\ProxySwitch" | Out-Null
+Invoke-WebRequest -UseBasicParsing `
+    -Uri 'https://raw.githubusercontent.com/fmonthel/blocked-domain/refs/heads/main/Switch-proxy-ps1' `
+    -OutFile "$env:LOCALAPPDATA\ProxySwitch\Switch-Proxy.ps1"
 ```
 
 > [!TIP]

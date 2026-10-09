@@ -1,4 +1,5 @@
 # Switch-Proxy.ps1 : choisit le proxy selon le réseau Wi-Fi
+# N'utilise pas netsh : fonctionne sans la localisation et sans droits admin
 $ProxyDefaut = 'nk-h2k4g2.flox-arts.net:8443'
 $ProxyFlox   = '192.168.18.245:3128'
 $RegPath     = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
@@ -6,12 +7,23 @@ $Log         = Join-Path $PSScriptRoot 'switch-proxy.log'
 
 Start-Sleep -Seconds 3   # laisse la connexion se stabiliser
 
-# Profil WLAN actif + SSID
-$infos  = netsh wlan show interfaces
-$profil = ($infos | Select-String '^\s+Profile?\s+:\s+(.+)$' | Select-Object -First 1).Matches.Groups[1].Value
-$ssid   = ($infos | Select-String '^\s+SSID\s+:\s+(.+)$'     | Select-Object -First 1).Matches.Groups[1].Value
+# Dernière connexion Wi-Fi réussie (événement 8001 du journal WLAN-AutoConfig)
+$profil = $null
+$ssid   = $null
+$evt = Get-WinEvent -LogName 'Microsoft-Windows-WLAN-AutoConfig/Operational' `
+       -FilterXPath '*[System[EventID=8001]]' -MaxEvents 1 -ErrorAction SilentlyContinue
+if ($evt) {
+    $data = @{}
+    ([xml]$evt.ToXml()).Event.EventData.Data | ForEach-Object { $data[$_.Name] = $_.'#text' }
+    # Ne retenir l'événement que si la carte Wi-Fi concernée est toujours connectée
+    $carte = Get-NetAdapter | Where-Object { $_.InterfaceGuid -eq $data.InterfaceGuid -and $_.Status -eq 'Up' }
+    if ($carte) {
+        $profil = $data.ProfileName
+        $ssid   = $data.SSID
+    }
+}
 
-# Repli si netsh ne répond pas (localisation désactivée, Ethernet…)
+# Pas de Wi-Fi connecté (Ethernet…) : nom du réseau vu par Windows
 if (-not $profil) {
     $profil = (Get-NetConnectionProfile | Select-Object -ExpandProperty Name) -join ', '
 }

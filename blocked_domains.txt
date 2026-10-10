@@ -492,3 +492,93 @@ copilot.cloud.microsoft
 .eaglex.ic.gov
 .tmw-defender.pro
 .pushtorm.net
+
+# ---------------------------------------------------------------------------
+# Gambling - whole top-level domains
+# ---------------------------------------------------------------------------
+.casino
+.bet
+.poker
+.bingo
+
+# ---------------------------------------------------------------------------
+# Gambling - online casinos, sportsbooks, poker (incl. Canada / Quebec)
+# ---------------------------------------------------------------------------
+.gambinoslot.com
+.bet365.com
+.betway.com
+.pokerstars.com
+.pokerstars.net
+.pokerstars.ca
+.888.com
+.888casino.com
+.888poker.com
+.888sport.com
+.williamhill.com
+.betfair.com
+.paddypower.com
+.unibet.com
+.bwin.com
+.draftkings.com
+.fanduel.com
+.betmgm.com
+.caesarssportsbook.com
+.pointsbet.com
+.betrivers.com
+.leovegas.com
+.casumo.com
+.mrgreen.com
+.betsson.com
+.ggpoker.com
+.partypoker.com
+.partycasino.com
+.jackpotcity.com
+.spincasino.com
+.royalvegascasino.com
+.rubyfortune.com
+.1xbet.com
+.melbet.com
+.mostbet.com
+.22bet.com
+.parimatch.com
+.lotoquebec.com
+.espacejeux.com
+.olg.ca
+.playnow.com
+.proline.ca
+
+# ---------------------------------------------------------------------------
+# Gambling - crypto casinos and skin / Roblox gambling
+# ---------------------------------------------------------------------------
+.stake.com
+.stake.us
+.roobet.com
+.rollbit.com
+.bc.game
+.bitstarz.com
+.shuffle.com
+.gamdom.com
+.duelbits.com
+.csgoempire.com
+.csgoroll.com
+.hellcase.com
+.clash.gg
+.packdraw.com
+.bloxflip.com
+.rblxwild.com
+
+# ---------------------------------------------------------------------------
+# Gambling - social / sweepstakes casinos (slots apps aimed at young players)
+# ---------------------------------------------------------------------------
+.chumbacasino.com
+.luckylandslots.com
+.pulsz.com
+.wowvegas.com
+.fortunecoins.com
+.mcluck.com
+.slotomania.com
+.playtika.com
+.doubledowncasino.com
+.bigfishcasino.com
+.huuugecasino.com
+.zyngapoker.com

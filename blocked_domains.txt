@@ -332,10 +332,155 @@ chromewebstore.google.com
 addons.mozilla.org
 
 # ---------------------------------------------------------------------------
-# Games
+# Games - browser game portals (seen in proxy logs first)
 # ---------------------------------------------------------------------------
 .azgames.io
+.azgame.io
 .crazygames.com
+.poki.com
+.poki-cdn.com
+.poki.io
+.snokido.fr
+.snokido.com
+.twoplayergames.org
+.y8.com
+.minefun.io
+.jeux.org
+.jeux.fr
+.1001jeux.fr
+.gamesgamescdn.com
+.gamesgames.com
+.wgplayer.com
+.gamedistribution.com
+.gamepix.com
+.miniclip.com
+.friv.com
+.kizi.com
+.kongregate.com
+.armorgames.com
+.addictinggames.com
+.coolmathgames.com
+.agame.com
+.lagged.com
+.silvergames.com
+.1001games.com
+.gamezop.com
+.pogo.com
+.newgrounds.com
+.ngfiles.com
+.itch.io
+.itch.zone
+.gamejolt.com
+.jeuxvideo.com
+.yandex.ru
+.yandex.com
+
+# ---------------------------------------------------------------------------
+# Games - .io multiplayer games
+# ---------------------------------------------------------------------------
+.krunker.io
+.slither.io
+.agar.io
+.diep.io
+.shellshock.io
+.moomoo.io
+.zombsroyale.io
+.smashkarts.io
+.bloxd.io
+.ev.io
+.venge.io
+.paper-io.com
+.iogames.space
+.1v1.lol
+
+# ---------------------------------------------------------------------------
+# Games - platforms, launchers and multiplayer services
+# ---------------------------------------------------------------------------
+.roblox.com
+.rbxcdn.com
+.rbx.com
+.minecraft.net
+.minecraftservices.com
+.mojang.com
+.epicgames.com
+.fortnite.com
+.steampowered.com
+.steamcommunity.com
+.steamstatic.com
+.ea.com
+.ubisoft.com
+.ubi.com
+.battle.net
+.blizzard.com
+.riotgames.com
+.leagueoflegends.com
+.playvalorant.com
+.supercell.com
+.exitgames.com
+.photonengine.io
+.photonengine.com
+
+# ---------------------------------------------------------------------------
+# AI platforms (chatbots, image/video/music generators, AI companions)
+# ---------------------------------------------------------------------------
+.openai.com
+.chatgpt.com
+.oaistatic.com
+.oaiusercontent.com
+.sora.com
+.claude.ai
+.claude.com
+.claudeusercontent.com
+.anthropic.com
+gemini.google.com
+aistudio.google.com
+notebooklm.google.com
+bard.google.com
+copilot.microsoft.com
+copilot.cloud.microsoft
+.perplexity.ai
+.pplx.ai
+.mistral.ai
+.deepseek.com
+.grok.com
+.x.ai
+.meta.ai
+.character.ai
+.poe.com
+.huggingface.co
+.you.com
+.pi.ai
+.phind.com
+.blackbox.ai
+.lmarena.ai
+.openrouter.ai
+.groq.com
+.kimi.com
+.qwen.ai
+.doubao.com
+.monica.im
+.sider.ai
+.getmerlin.in
+.quillbot.com
+.jasper.ai
+.writesonic.com
+.chatpdf.com
+.gamma.app
+.midjourney.com
+.leonardo.ai
+.ideogram.ai
+.craiyon.com
+.runwayml.com
+.elevenlabs.io
+.suno.com
+.suno.ai
+.udio.com
+.novelai.net
+.janitorai.com
+.replika.com
+.talkie-ai.com
+.crushon.ai
+.candy.ai
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)

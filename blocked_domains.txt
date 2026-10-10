@@ -351,6 +351,8 @@ addons.mozilla.org
 .gamesgamescdn.com
 .gamesgames.com
 .wgplayer.com
+.gamedock.io
+.ubg235.com
 .gamedistribution.com
 .gamepix.com
 .miniclip.com
@@ -582,3 +584,4 @@ copilot.cloud.microsoft
 .bigfishcasino.com
 .huuugecasino.com
 .zyngapoker.com
+.freeslots-machines.com

@@ -378,6 +378,15 @@ addons.mozilla.org
 .jeuxvideo.com
 .yandex.ru
 .yandex.com
+# Yandex Games mirrors (yandex.md seen in proxy report 2026-10-09 right after yandex.ru)
+.yandex.md
+.yandex.by
+.yandex.kz
+.yandex.ua
+.yandex.uz
+.yandex.com.tr
+.ya.ru
+.playhop.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

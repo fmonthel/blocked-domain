@@ -354,6 +354,8 @@ addons.mozilla.org
 .gamedock.io
 .ubg235.com
 .gamedistribution.com
+.gamemonetize.com
+.kodub.com
 .gamepix.com
 .miniclip.com
 .friv.com
@@ -394,6 +396,7 @@ addons.mozilla.org
 .paper-io.com
 .iogames.space
 .1v1.lol
+.cowboy-safari.io
 
 # ---------------------------------------------------------------------------
 # Games - platforms, launchers and multiplayer services
@@ -421,6 +424,7 @@ addons.mozilla.org
 .exitgames.com
 .photonengine.io
 .photonengine.com
+.colyseus.cloud
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

@@ -1,0 +1,5 @@
+# root crontab on both servers (crontab -e)
+# refresh the blocklist from GitHub every hour
+0 * * * * /root/squid/update-squid-blocklist.sh >> /var/log/squid-blocklist.log 2>&1
+# daily report e-mail at 21:00 (only sent if the kids used this proxy today)
+0 21 * * * /usr/bin/python3 -B /root/squid/daily-squid-report.py >> /var/log/squid-report.log 2>&1

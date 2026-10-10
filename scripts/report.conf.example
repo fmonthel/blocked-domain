@@ -1,0 +1,20 @@
+# Config for /root/squid/daily-squid-report.py
+# install: cp report.conf.example /root/squid/report.conf && chmod 600 /root/squid/report.conf
+
+[kids]
+# squid account = name shown in the report
+kid1account = Kid One
+kid2account = Kid Two
+
+[report]
+to = parent1@example.com, parent2@example.com
+max_sites = 40
+
+[smtp]
+# Google Workspace / Gmail SMTP (port 25 is blocked by most ISPs, 587 works).
+# password_file holds a Google "app password" (https://myaccount.google.com/apppasswords), chmod 600.
+host = smtp.gmail.com
+port = 587
+user = sender@example.com
+from = Family proxy <sender@example.com>
+password_file = /root/squid/.smtp-app-password

@@ -2,6 +2,8 @@
 # ".example.com" blocks example.com and all its subdomains; "host.example.com" blocks only that host.
 # Lines starting with # are ignored by Squid. Avoid overlapping entries (a subdomain of an entry
 # already listed with a leading dot): Squid warns and ignores them.
+# Hosts containing "jeu"/"jeux" (not "jeunesse") or "game" are already blocked by the game_words
+# regex in squid.conf (acl game_words dstdom_regex -i jeu($|[^n])|game): do not list them here.
 
 # ---------------------------------------------------------------------------
 # Adult content - whole top-level domains
@@ -334,48 +336,26 @@ addons.mozilla.org
 # ---------------------------------------------------------------------------
 # Games - browser game portals (seen in proxy logs first)
 # ---------------------------------------------------------------------------
-.azgames.io
-.azgame.io
-.crazygames.com
 .poki.com
 .poki-cdn.com
 .poki.io
 .snokido.fr
 .snokido.com
-.twoplayergames.org
 .y8.com
 .minefun.io
-.jeux.org
-.jeux.fr
-.1001jeux.fr
-.gamesgamescdn.com
-.gamesgames.com
 .wgplayer.com
-.gamedock.io
 .ubg235.com
-.gamedistribution.com
-.gamemonetize.com
 .kodub.com
-.gamepix.com
 .miniclip.com
 .friv.com
 .kizi.com
 .kongregate.com
-.armorgames.com
-.addictinggames.com
-.coolmathgames.com
-.agame.com
 .lagged.com
-.silvergames.com
-.1001games.com
-.gamezop.com
 .pogo.com
 .newgrounds.com
 .ngfiles.com
 .itch.io
 .itch.zone
-.gamejolt.com
-.jeuxvideo.com
 .yandex.ru
 .yandex.com
 # Yandex Games mirrors (yandex.md seen in proxy report 2026-10-09 right after yandex.ru)
@@ -403,7 +383,6 @@ addons.mozilla.org
 .ev.io
 .venge.io
 .paper-io.com
-.iogames.space
 .1v1.lol
 .cowboy-safari.io
 
@@ -416,7 +395,6 @@ addons.mozilla.org
 .minecraft.net
 .minecraftservices.com
 .mojang.com
-.epicgames.com
 .fortnite.com
 .steampowered.com
 .steamcommunity.com
@@ -426,11 +404,9 @@ addons.mozilla.org
 .ubi.com
 .battle.net
 .blizzard.com
-.riotgames.com
 .leagueoflegends.com
 .playvalorant.com
 .supercell.com
-.exitgames.com
 .photonengine.io
 .photonengine.com
 .colyseus.cloud
@@ -557,7 +533,6 @@ copilot.cloud.microsoft
 .22bet.com
 .parimatch.com
 .lotoquebec.com
-.espacejeux.com
 .olg.ca
 .playnow.com
 .proline.ca
@@ -569,7 +544,6 @@ copilot.cloud.microsoft
 .stake.us
 .roobet.com
 .rollbit.com
-.bc.game
 .bitstarz.com
 .shuffle.com
 .gamdom.com

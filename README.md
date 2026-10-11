@@ -1,102 +1,89 @@
-# ProxySwitch
+# Proxy familial
 
-Bascule automatiquement le proxy Windows selon le réseau Wi‑Fi auquel le poste se connecte.
+Contrôle parental maison : les appareils des enfants passent par un proxy **Squid** avec identifiant,
+qui bloque une liste de domaines (adulte, vidéo, réseaux sociaux, jeux, IA, jeux d'argent, VPN…)
+et envoie chaque soir un rapport par e-mail aux parents.
 
-| Réseau | Proxy appliqué |
-|---|---|
-| Profil contenant `WCDM` | Désactivé |
-| `Flox-arts.net` (profil ou SSID) | `http://192.168.18.245:3128` |
-| Tout autre réseau | `http://nk-h2k4g2.flox-arts.net:8443` |
+Deux serveurs indépendants, configurés à l'identique :
 
-Les règles sont testées dans cet ordre : la première qui correspond s'applique.
+| Serveur | Rôle | Réseau | Accès depuis Internet |
+|---|---|---|---|
+| **nicomaque** (Debian 12, Squid 5.7) | principal | `192.168.18.245` | `nk-h2k4g2.flox-arts.net:8443` (routeur : 8443 → 3128) |
+| **aphrodite** (Raspberry Pi, Debian 11, Squid 4.13) | secours, autre site | `192.168.18.210` | `nk-j8b3b7.flox-arts.net:8443` |
 
-## Prérequis
+## Schéma
 
-- Windows 10 / 11
-- PowerShell 5.1 ou supérieur
-- Aucun droit administrateur requis (le proxy est un réglage utilisateur, `HKCU`)
+```mermaid
+flowchart LR
+    subgraph Enfants["Appareils des enfants"]
+        PC["PC Windows<br/>ProxySwitch"]
+        TEL["iPhone<br/>WireGuard"]
+    end
 
-> [!NOTE]
-> Sur Windows 11 24H2 et plus, `netsh wlan` peut exiger que la **localisation** soit activée
-> (*Paramètres → Confidentialité et sécurité → Localisation*). Sinon, le script se rabat sur
-> `Get-NetConnectionProfile`.
+    subgraph Maison["Maison - 192.168.18.0/24"]
+        R1["Routeur<br/>NAT 8443 → 3128"]
+        subgraph N["nicomaque"]
+            SQ1["Squid :3128 / :8443<br/>auth + blocklist"]
+            WG1["WireGuard :51820<br/>+ BIND 10.10.10.1"]
+            CR1["cron<br/>blocklist (horaire)<br/>rapport 21:00"]
+        end
+    end
 
-## 1. Installer le script
+    subgraph Site2["Autre site (secours)"]
+        R2["Routeur<br/>8443, 51820"]
+        subgraph A["aphrodite"]
+            SQ2["Squid :3128 / :8443"]
+            WG2["WireGuard + BIND"]
+            CR2["cron"]
+        end
+    end
 
-Créer le dossier `%LOCALAPPDATA%\ProxySwitch\` et y enregistrer le fichier `Switch-Proxy.ps1` :
+    GH[("GitHub<br/>blocked_domains.txt")]
+    WEB(("Internet"))
+    MAIL["Gmail SMTP :587<br/>→ e-mail aux parents"]
 
-```powershell
-New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\ProxySwitch" | Out-Null
-Invoke-WebRequest -UseBasicParsing `
-    -Uri 'https://raw.githubusercontent.com/fmonthel/blocked-domain/refs/heads/main/Switch-proxy-ps1' `
-    -OutFile "$env:LOCALAPPDATA\ProxySwitch\Switch-Proxy.ps1"
+    PC -- "à la maison : 192.168.18.245:3128" --> SQ1
+    PC -- "ailleurs : nk-h2k4g2…:8443" --> R1 --> SQ1
+    TEL -- "VPN" --> R1 --> WG1
+    TEL -. "secours" .-> R2 --> WG2
+    SQ1 --> WEB
+    SQ2 --> WEB
+    R2 --> SQ2
+    GH -- "update-squid-blocklist.sh" --> CR1 & CR2
+    CR1 & CR2 -- "daily-squid-report.py" --> MAIL
 ```
 
-> [!TIP]
-> Dans les réglages Windows, le proxy s'écrit `hôte:port` sans `http://` : c'est un proxy HTTP par défaut.
+## Ce qui est bloqué
 
-## 2. Créer la tâche planifiée
+- **`blocked_domains.txt`** : la liste, rechargée toutes les heures par chaque serveur.
+  Une entrée `.exemple.com` bloque le domaine et tous ses sous-domaines.
+  Toute modification passe par une MR ; une fois fusionnée, les serveurs l'appliquent dans l'heure.
+- **Mot-clé** : tout domaine contenant `jeu`, `jeux` (mais pas `jeunesse`) ou `game`.
+- **Page de blocage** « Homework time! » (en anglais) pour les sites en `http://`.
+  Pour les sites en `https://`, le navigateur affiche sa propre page d'erreur
+  (un navigateur n'affiche jamais une page envoyée par un proxy pour un site HTTPS).
 
-À exécuter une seule fois dans PowerShell. La tâche se déclenche :
+## Contenu du dépôt
 
-- à **chaque connexion réseau** (événement `10000` du journal `Microsoft-Windows-NetworkProfile/Operational`) ;
-- à **l'ouverture de session**.
+| Chemin | Description | Installé sur les serveurs dans |
+|---|---|---|
+| [`blocked_domains.txt`](blocked_domains.txt) | liste des domaines bloqués | `/etc/squid/blocked_domains.txt` (par le script) |
+| [`squid/squid.conf`](squid/squid.conf) | configuration Squid (identique sur les 2 serveurs) | `/etc/squid/squid.conf` |
+| [`squid/errors/ERR_HOMEWORK`](squid/errors/ERR_HOMEWORK) | page de blocage | `/etc/squid/errors-custom/` |
+| [`scripts/update-squid-blocklist.sh`](scripts/update-squid-blocklist.sh) | télécharge la liste, recharge Squid, revient en arrière en cas d'erreur | `/root/squid/` |
+| [`scripts/daily-squid-report.py`](scripts/daily-squid-report.py) | rapport quotidien HTML par enfant (navigateurs / applications, autorisés / bloqués) | `/root/squid/` |
+| [`scripts/report.conf.example`](scripts/report.conf.example) | configuration du rapport (destinataires, SMTP) | `/root/squid/report.conf` |
+| [`scripts/crontab`](scripts/crontab) | tâches planifiées | crontab de root |
+| [`bind/named.conf.options`](bind/named.conf.options) | DNS des clients VPN (requêtes amont en TCP) | `/etc/bind/` |
+| [`wireguard/wg0.conf.example`](wireguard/wg0.conf.example) | VPN (sans les clés) | `/etc/wireguard/wg0.conf` |
+| [`system/`](system/) | IPv6 désactivé, `resolv.conf` | `/etc/sysctl.d/`, `/etc/` |
+| [`Switch-proxy-ps1`](Switch-proxy-ps1), [`get-ssid.ps1`](get-ssid.ps1) | bascule automatique du proxy sur les PC Windows | `%LOCALAPPDATA%\ProxySwitch\` |
 
-```powershell
-$Script = "$env:LOCALAPPDATA\ProxySwitch\Switch-Proxy.ps1"
+## Documentation
 
-# Déclencheur sur événement « réseau connecté »
-$cls  = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler
-$trigEvent = New-CimInstance -CimClass $cls -ClientOnly
-$trigEvent.Enabled = $true
-$trigEvent.Subscription = '<QueryList><Query Id="0" Path="Microsoft-Windows-NetworkProfile/Operational"><Select Path="Microsoft-Windows-NetworkProfile/Operational">*[System[EventID=10000]]</Select></Query></QueryList>'
+- [Installation d'un serveur](docs/server-setup.md)
+- [Setup des PC Windows (ProxySwitch)](docs/windows-setup.md)
 
-$trigLogon = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-
-$action    = New-ScheduledTaskAction -Execute 'powershell.exe' `
-             -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Script`""
-$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
-$settings  = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
-
-Register-ScheduledTask -TaskName 'ProxySwitch' -Trigger $trigEvent, $trigLogon `
-    -Action $action -Principal $principal -Settings $settings -Force
-```
-
-> [!IMPORTANT]
-> En cas d'erreur « Accès refusé », relancer ce bloc dans un PowerShell **administrateur**.
-> La tâche s'exécutera quand même sous le compte utilisateur.
-
-## Utilisation
-
-Forcer une exécution immédiate :
-
-```powershell
-Start-ScheduledTask -TaskName ProxySwitch
-```
-
-Consulter le journal :
-
-```powershell
-Get-Content "$env:LOCALAPPDATA\ProxySwitch\switch-proxy.log" -Tail 5
-```
-
-Exemple de sortie :
-
-```
-2026-10-08 09:12:41  SSID='Flox-arts.net'  Profil='Flox-arts.net'  ->  proxy Flox-arts : 192.168.18.245:3128
-```
-
-## Désinstallation
-
-```powershell
-Unregister-ScheduledTask -TaskName ProxySwitch -Confirm:$false
-Remove-Item "$env:LOCALAPPDATA\ProxySwitch" -Recurse
-```
-
-## Limites
-
-- Seul le proxy **utilisateur** (WinINet : Edge, Chrome, la plupart des applications) est modifié.
-  Les services utilisant **WinHTTP** nécessitent `netsh winhttp set proxy` (administrateur).
-- Le proxy est réappliqué à chaque connexion, mais l'utilisateur peut le désactiver manuellement
-  entre deux connexions. Pour un verrouillage strict, passer par une GPO.
-- Une fenêtre PowerShell peut apparaître une fraction de seconde au déclenchement.
+> [!CAUTION]
+> Ce dépôt est **public**. N'y mettez jamais de mot de passe, de clé WireGuard,
+> de fichier `/etc/squid/passwords` ni le mot de passe d'application SMTP.

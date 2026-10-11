@@ -367,6 +367,11 @@ addons.mozilla.org
 .yandex.com.tr
 .ya.ru
 .playhop.com
+# HTML5 game portals / publishers seen in proxy report 2026-10-11 (Timothé)
+.msnfun.com
+.playgama.com
+.famobi.com
+.marketjs.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

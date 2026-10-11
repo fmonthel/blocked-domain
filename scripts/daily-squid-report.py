@@ -282,6 +282,12 @@ def render_group(gid, title, subtitle, g, max_sites):
     return "".join(out)
 
 
+def browser_blocked(d):
+    """Blocked attempts made from a web browser: the headline count (apps retry in the background
+    and would drown it; they stay listed in their own section)."""
+    return sum(v[0] for v in d["groups"]["browser"]["blocked"].values())
+
+
 def group_used(g):
     return g["sites"] or g["blocked"] or g["noise"]
 
@@ -297,7 +303,7 @@ def render_html(day, kids, data, unknown, max_sites):
     for user, name in kids.items():
         d = data[user]
         groups = d["groups"]
-        nblocked = sum(v[0] for g in groups.values() for v in g["blocked"].values())
+        nblocked = browser_blocked(d)
         nsites = len(groups["browser"]["sites"]) + len(groups["unknown"]["sites"])
         stat = lambda v, l, c="#111827": (f'<td style="padding:10px 12px;background:#f9fafb;border-radius:8px;text-align:center;">'
                                          f'<div style="font-size:20px;font-weight:600;color:{c};">{v}</div>'
@@ -308,7 +314,7 @@ def render_html(day, kids, data, unknown, max_sites):
             continue
         out.append('<table role="presentation" cellspacing="6" style="width:100%;border-collapse:separate;"><tr>'
                    + stat(nsites, "sites (navigateur)")
-                   + stat(nblocked, "tentatives bloquées", "#b91c1c" if nblocked else "#111827")
+                   + stat(nblocked, "tentatives bloquées (navigateur)", "#b91c1c" if nblocked else "#111827")
                    + stat(f"{hm(d['first'])}&ndash;{hm(d['last'])}", "activité")
                    + stat(len(d["ips"]), "appareil(s)") + "</tr></table>")
         out.append(f'<div style="font-size:12px;color:#9ca3af;margin:2px 0 0 6px;">Appareils : {e(", ".join(sorted(d["ips"])))}</div>')
@@ -386,7 +392,7 @@ def main():
 
     s = cfg["smtp"]
     password = "".join(open(s["password_file"]).read().split())  # Google shows app passwords with spaces
-    total_blocked = sum(v[0] for u in kids for g in data[u]["groups"].values() for v in g["blocked"].values())
+    total_blocked = sum(browser_blocked(data[u]) for u in kids)
     msg = EmailMessage()
     msg["Subject"] = f"Proxy familial ({SERVER}) - {fr_date(day)}" + (f" - {total_blocked} blocages" if total_blocked else "")
     msg["From"] = s["from"]

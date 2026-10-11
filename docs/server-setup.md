@@ -44,13 +44,16 @@ ufw allow 51820/udp                              # WireGuard
 ufw allow from 10.10.10.0/24                     # clients VPN
 ```
 
-## 3. Blocklist et rapport quotidien
+## 3. Synchro GitHub, blocklist et rapport quotidien
+
+Une fois `sync-from-github.sh` et le fichier cron installés, le serveur récupère tout seul
+les scripts et les configs depuis `main` (toutes les 15 minutes) : il suffit de les amorcer.
 
 ```bash
 mkdir -p /root/squid
-cp scripts/update-squid-blocklist.sh scripts/daily-squid-report.py /root/squid/
-chmod 755 /root/squid/update-squid-blocklist.sh
-chmod 700 /root/squid/daily-squid-report.py
+cp scripts/sync-from-github.sh /root/squid/ && chmod 755 /root/squid/sync-from-github.sh
+cp scripts/squid-proxy.cron /etc/cron.d/squid-proxy
+/root/squid/sync-from-github.sh --force      # installe scripts, squid.conf, page de blocage, BIND
 cp scripts/report.conf.example /root/squid/report.conf && chmod 600 /root/squid/report.conf
 # éditer report.conf : comptes des enfants, destinataires, expéditeur
 
@@ -60,8 +63,9 @@ read -rsp "Mot de passe d'application : " P && printf '%s' "$P" > /root/squid/.s
 
 /root/squid/update-squid-blocklist.sh                                   # 1re liste
 python3 -B /root/squid/daily-squid-report.py --preview /tmp/rapport.html # aperçu sans envoi
-crontab -e                                                              # coller scripts/crontab
 ```
+
+Journal de la synchro : `/var/log/squid-sync.log` (une ligne par fichier déployé).
 
 Le rapport n'est envoyé que s'il y a eu du trafic des enfants ce jour-là.
 Options : `--date AAAA-MM-JJ` pour une autre journée, `--preview fichier.html` pour ne pas envoyer.
@@ -90,5 +94,5 @@ un bloc `*nat` avec `-A POSTROUTING -o <interface-wan> -j MASQUERADE`.
 ```bash
 systemctl is-active squid named wg-quick@wg0
 curl -s -o /dev/null -w '%{http_code}\n' -x http://127.0.0.1:3128 http://example.com   # 407 attendu
-tail /var/log/squid-blocklist.log /var/log/squid-report.log
+tail /var/log/squid-sync.log /var/log/squid-blocklist.log /var/log/squid-report.log
 ```

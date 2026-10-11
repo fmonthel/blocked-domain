@@ -25,7 +25,7 @@ flowchart LR
         subgraph N["nicomaque"]
             SQ1["Squid :3128 / :8443<br/>auth + blocklist"]
             WG1["WireGuard :51820<br/>+ BIND 10.10.10.1"]
-            CR1["cron<br/>blocklist (horaire)<br/>rapport 21:00"]
+            CR1["cron<br/>synchro (15 min)<br/>blocklist (horaire)<br/>rapport 21:00"]
         end
     end
 
@@ -38,7 +38,7 @@ flowchart LR
         end
     end
 
-    GH[("GitHub<br/>blocked_domains.txt")]
+    GH[("GitHub (main)<br/>blocklist, configs, scripts")]
     WEB(("Internet"))
     MAIL["Gmail SMTP :587<br/>→ e-mail aux parents"]
 
@@ -49,7 +49,7 @@ flowchart LR
     SQ1 --> WEB
     SQ2 --> WEB
     R2 --> SQ2
-    GH -- "update-squid-blocklist.sh" --> CR1 & CR2
+    GH -- "sync-from-github.sh<br/>update-squid-blocklist.sh" --> CR1 & CR2
     CR1 & CR2 -- "daily-squid-report.py" --> MAIL
 ```
 
@@ -63,6 +63,30 @@ flowchart LR
   Pour les sites en `https://`, le navigateur affiche sa propre page d'erreur
   (un navigateur n'affiche jamais une page envoyée par un proxy pour un site HTTPS).
 
+## Mise à jour automatique des serveurs
+
+Les serveurs suivent la branche `main` : **il suffit de fusionner une MR**.
+
+| Quoi | Par qui | Délai |
+|---|---|---|
+| `blocked_domains.txt` | `update-squid-blocklist.sh` | à l'heure pile |
+| configs Squid / BIND, page de blocage, scripts, tâches cron | `sync-from-github.sh` | 15 min au plus |
+
+`sync-from-github.sh` ne fait rien si le dernier commit de `main` est déjà déployé. Sinon il télécharge
+le dépôt, **vérifie chaque fichier avant de l'installer** (`bash -n`, syntaxe Python, `squid -k parse`,
+`named-checkconf`), recharge Squid ou BIND seulement si leurs fichiers ont changé, et remet l'ancienne
+version si Squid ne redémarre pas. Un fichier invalide n'est pas installé et la synchro réessaie au
+passage suivant.
+
+Suivi sur un serveur :
+
+```bash
+tail /var/log/squid-sync.log                 # ce qui a été déployé
+cat /root/squid/.deployed-commit             # commit en place
+/root/squid/sync-from-github.sh --dry-run    # ce qui changerait, sans rien installer
+/root/squid/sync-from-github.sh --force      # redéployer maintenant
+```
+
 ## Contenu du dépôt
 
 | Chemin | Description | Installé sur les serveurs dans |
@@ -73,7 +97,8 @@ flowchart LR
 | [`scripts/update-squid-blocklist.sh`](scripts/update-squid-blocklist.sh) | télécharge la liste, recharge Squid, revient en arrière en cas d'erreur | `/root/squid/` |
 | [`scripts/daily-squid-report.py`](scripts/daily-squid-report.py) | rapport quotidien HTML par enfant (navigateurs / applications, autorisés / bloqués) | `/root/squid/` |
 | [`scripts/report.conf.example`](scripts/report.conf.example) | configuration du rapport (destinataires, SMTP) | `/root/squid/report.conf` |
-| [`scripts/crontab`](scripts/crontab) | tâches planifiées | crontab de root |
+| [`scripts/sync-from-github.sh`](scripts/sync-from-github.sh) | déploie la dernière version de `main` (configs, scripts, cron) | `/root/squid/` |
+| [`scripts/squid-proxy.cron`](scripts/squid-proxy.cron) | tâches planifiées (synchro, blocklist, rapport) | `/etc/cron.d/squid-proxy` |
 | [`bind/named.conf.options`](bind/named.conf.options) | DNS des clients VPN (requêtes amont en TCP) | `/etc/bind/` |
 | [`wireguard/wg0.conf.example`](wireguard/wg0.conf.example) | VPN (sans les clés) | `/etc/wireguard/wg0.conf` |
 | [`system/`](system/) | IPv6 désactivé, `resolv.conf` | `/etc/sysctl.d/`, `/etc/` |

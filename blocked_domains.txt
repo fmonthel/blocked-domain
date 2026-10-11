@@ -336,6 +336,9 @@ addons.mozilla.org
 # ---------------------------------------------------------------------------
 # Games - browser game portals (seen in proxy logs first)
 # ---------------------------------------------------------------------------
+# Google Sites: common host for "unblocked games" pages (sites.google.com/view/...).
+# With HTTPS the proxy only sees the host name, so the whole of Google Sites is blocked.
+sites.google.com
 .poki.com
 .poki-cdn.com
 .poki.io

@@ -372,6 +372,7 @@ addons.mozilla.org
 .playgama.com
 .famobi.com
 .marketjs.com
+.msn.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -415,6 +416,7 @@ addons.mozilla.org
 .photonengine.io
 .photonengine.com
 .colyseus.cloud
+.start.gg
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

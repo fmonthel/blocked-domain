@@ -417,6 +417,7 @@ addons.mozilla.org
 .photonengine.com
 .colyseus.cloud
 .start.gg
+.unity.com
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

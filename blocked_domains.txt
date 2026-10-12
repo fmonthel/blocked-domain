@@ -203,6 +203,7 @@ youtubei.googleapis.com
 .snapchat.com
 .snap.com
 .sc-cdn.net
+.sc-prod.net
 .snapkit.com
 .reddit.com
 .redd.it
@@ -251,6 +252,8 @@ youtubei.googleapis.com
 # ---------------------------------------------------------------------------
 # VPN services
 # ---------------------------------------------------------------------------
+# Opera / Opera GX browser (built-in free VPN), seen in proxy report 2026-10-11 (Timothé)
+.opera.com
 .nordvpn.com
 .nordvpn.net
 .expressvpn.com
@@ -376,6 +379,22 @@ sites.google.com
 .famobi.com
 .marketjs.com
 .msn.com
+# Unblocked-games mirrors / portals seen in proxy report 2026-10-11 (Antoine, 17:30-17:39)
+.ubg365.org
+.classroom-6x.org
+.poki.ee
+.frivez.com
+.minijuegosgratis.com
+.playsaurus.com
+.1v1lol.org
+.retrobowl26.com
+.tetrys.org
+.pvz.onl
+.googlesnake.org
+.duckduckclicker.org
+.geometrydash.ee
+.fridaynightfunkin.org
+.monkeymart.org
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -421,6 +440,7 @@ sites.google.com
 .colyseus.cloud
 .start.gg
 .unity.com
+.unity3d.com
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

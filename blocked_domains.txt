@@ -203,6 +203,7 @@ youtubei.googleapis.com
 .snapchat.com
 .snap.com
 .sc-cdn.net
+.sc-prod.net
 .snapkit.com
 .reddit.com
 .redd.it
@@ -251,6 +252,8 @@ youtubei.googleapis.com
 # ---------------------------------------------------------------------------
 # VPN services
 # ---------------------------------------------------------------------------
+# Opera / Opera GX browser (built-in free VPN), seen in proxy report 2026-10-11 (Timothé)
+.opera.com
 .nordvpn.com
 .nordvpn.net
 .expressvpn.com

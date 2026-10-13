@@ -57,6 +57,9 @@
 .imagefap.com
 .sex.com
 .literotica.com
+# Seen in proxy report 2026-10-12 (Antoine, 12:36-12:39)
+.hotxvideo.website
+.freehotvideos.site
 
 # ---------------------------------------------------------------------------
 # Adult content - webcams, paysites, creator platforms
@@ -395,6 +398,8 @@ sites.google.com
 .geometrydash.ee
 .fridaynightfunkin.org
 .monkeymart.org
+# Seen in proxy report 2026-10-12 (Timothé, 14:41, 24 accesses alongside pages.dev / workers.dev)
+.cybercontrolnetwork.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -413,6 +418,8 @@ sites.google.com
 .paper-io.com
 .1v1.lol
 .cowboy-safari.io
+# Seen in proxy report 2026-10-12 (Timothé, 16:28)
+.subwaysurferspc.io
 
 # ---------------------------------------------------------------------------
 # Games - platforms, launchers and multiplayer services
@@ -567,6 +574,8 @@ copilot.cloud.microsoft
 .olg.ca
 .playnow.com
 .proline.ca
+# Casino affiliate seen in proxy report 2026-10-12 (Timothé, 14:49-14:50)
+.casinoplusinsider.com
 
 # ---------------------------------------------------------------------------
 # Gambling - crypto casinos and skin / Roblox gambling

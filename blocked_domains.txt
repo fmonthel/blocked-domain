@@ -398,6 +398,8 @@ sites.google.com
 .geometrydash.ee
 .fridaynightfunkin.org
 .monkeymart.org
+# Seen in proxy report 2026-10-12 (Timothé, 14:41, 24 accesses alongside pages.dev / workers.dev)
+.cybercontrolnetwork.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

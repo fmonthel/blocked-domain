@@ -400,6 +400,8 @@ sites.google.com
 .monkeymart.org
 # Seen in proxy report 2026-10-12 (Timothé, 14:41, 24 accesses alongside pages.dev / workers.dev)
 .cybercontrolnetwork.com
+# Seen in proxy report 2026-10-13 (Antoine, 17:23, Chrome): suspected unblocked-games mirror, blocked on parent request
+.readyplayer1.xyz
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

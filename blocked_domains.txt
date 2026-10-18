@@ -403,7 +403,6 @@ sites.google.com
 # Seen in proxy report 2026-10-13 (Antoine, 17:23, Chrome): suspected unblocked-games mirror, blocked on parent request
 .readyplayer1.xyz
 # Game portals / browser games seen in proxy report 2026-10-17 (Antoine, 12:12-13:17, Chrome)
-.3dtuning.com
 .hoodamath.com
 .minijuegos.com
 .miniplay.com

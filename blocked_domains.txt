@@ -402,6 +402,12 @@ sites.google.com
 .cybercontrolnetwork.com
 # Seen in proxy report 2026-10-13 (Antoine, 17:23, Chrome): suspected unblocked-games mirror, blocked on parent request
 .readyplayer1.xyz
+# Game portals / browser games seen in proxy report 2026-10-17 (Antoine, 12:12-13:17, Chrome)
+.hoodamath.com
+.minijuegos.com
+.miniplay.com
+.littlealchemy.com
+.basketballstarsonline.org
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -422,6 +428,8 @@ sites.google.com
 .cowboy-safari.io
 # Seen in proxy report 2026-10-12 (Timothé, 16:28)
 .subwaysurferspc.io
+# Seen in proxy report 2026-10-17 (Antoine, 12:21, Chrome)
+.basketball-stars.io
 
 # ---------------------------------------------------------------------------
 # Games - platforms, launchers and multiplayer services
@@ -450,6 +458,8 @@ sites.google.com
 .start.gg
 .unity.com
 .unity3d.com
+# Game key / gift-card marketplace seen in proxy report 2026-10-17 (Antoine, 12:58, Chrome)
+.eneba.com
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

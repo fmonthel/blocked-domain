@@ -19,20 +19,26 @@ Les règles sont testées dans cet ordre : la première qui correspond s'appliqu
 - Aucun droit administrateur requis (le proxy est un réglage utilisateur, `HKCU`)
 
 > [!NOTE]
-> Sur Windows 11 24H2 et plus, `netsh wlan` peut exiger que la **localisation** soit activée
-> (*Paramètres → Confidentialité et sécurité → Localisation*). Sinon, le script se rabat sur
-> `Get-NetConnectionProfile`.
+> Le script n'utilise pas `netsh wlan` : il lit le profil et le SSID dans le journal
+> `Microsoft-Windows-WLAN-AutoConfig/Operational` (événement `8001`). Il fonctionne donc
+> **même avec la localisation désactivée**.
 
 ## 1. Installer le script
 
-Créer le dossier `%LOCALAPPDATA%\ProxySwitch\` et y enregistrer le fichier `Switch-Proxy.ps1` :
+Télécharger le script depuis ce dépôt dans `%LOCALAPPDATA%\ProxySwitch\` :
 
 ```powershell
 New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\ProxySwitch" | Out-Null
 Invoke-WebRequest -UseBasicParsing `
-    -Uri 'https://raw.githubusercontent.com/fmonthel/blocked-domain/refs/heads/main/Switch-proxy-ps1' `
+    -Uri 'https://raw.githubusercontent.com/fmonthel/blocked-domain/refs/heads/main/Switch-Proxy.ps1' `
     -OutFile "$env:LOCALAPPDATA\ProxySwitch\Switch-Proxy.ps1"
+
+# Topic ntfy pour les alertes (gardé en local, jamais dans le dépôt)
+Set-Content "$env:LOCALAPPDATA\ProxySwitch\ntfy-topic.txt" '<ton-topic>'
 ```
+
+Pour modifier les proxys ou les règles, éditer les variables en haut de
+`%LOCALAPPDATA%\ProxySwitch\Switch-Proxy.ps1`.
 
 > [!TIP]
 > Dans les réglages Windows, le proxy s'écrit `hôte:port` sans `http://` : c'est un proxy HTTP par défaut.
@@ -68,6 +74,34 @@ Register-ScheduledTask -TaskName 'ProxySwitch' -Trigger $trigEvent, $trigLogon `
 > En cas d'erreur « Accès refusé », relancer ce bloc dans un PowerShell **administrateur**.
 > La tâche s'exécutera quand même sous le compte utilisateur.
 
+## 3. Surveillance et alertes
+
+Une seconde tâche lance `Switch-Proxy.ps1 -Check` **toutes les 5 minutes**. Elle compare le registre
+à l'état appliqué lors du dernier changement de réseau (`expected.json`). Si quelqu'un a modifié le
+proxy à la main (désactivation, autre serveur, exceptions, script PAC), elle :
+
+1. **rétablit** le proxy attendu ;
+2. **envoie une notification** sur le topic [ntfy](https://ntfy.sh) défini dans `ntfy-topic.txt` ;
+3. note l'alerte dans `switch-proxy.log`.
+
+```powershell
+$Script    = "$env:LOCALAPPDATA\ProxySwitch\Switch-Proxy.ps1"
+$trigger   = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5)
+$action    = New-ScheduledTaskAction -Execute 'powershell.exe' `
+             -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Script`" -Check"
+$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
+$settings  = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
+
+Register-ScheduledTask -TaskName 'ProxyWatchdog' -Trigger $trigger `
+    -Action $action -Principal $principal -Settings $settings -Force
+```
+
+Pour recevoir les alertes : installer l'application **ntfy** (Android / iOS) et s'abonner au topic.
+
+> [!WARNING]
+> Sans droits administrateur, les tâches et les fichiers appartiennent à l'utilisateur surveillé :
+> il peut les supprimer. Le topic ntfy est public : quiconque connaît son nom peut le lire ou y publier.
+
 ## Utilisation
 
 Forcer une exécution immédiate :
@@ -88,10 +122,16 @@ Exemple de sortie :
 2026-10-08 09:12:41  SSID='Flox-arts.net'  Profil='Flox-arts.net'  ->  proxy Flox-arts : 192.168.18.245:3128
 ```
 
+## Mise à jour
+
+Relancer la commande de l'étape 1 : le fichier est écrasé par la dernière version du dépôt.
+La tâche planifiée n'a pas besoin d'être recréée.
+
 ## Désinstallation
 
 ```powershell
 Unregister-ScheduledTask -TaskName ProxySwitch -Confirm:$false
+Unregister-ScheduledTask -TaskName ProxyWatchdog -Confirm:$false
 Remove-Item "$env:LOCALAPPDATA\ProxySwitch" -Recurse
 ```
 

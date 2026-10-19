@@ -59,6 +59,9 @@ flowchart LR
   Une entrée `.exemple.com` bloque le domaine et tous ses sous-domaines.
   Toute modification passe par une MR ; une fois fusionnée, les serveurs l'appliquent dans l'heure.
 - **Mot-clé** : tout domaine contenant `jeu`, `jeux` (mais pas `jeunesse`) ou `game`.
+- **Microsoft sans identifiant** : Office, Windows Update et la connexion au compte Microsoft
+  passent sans login (Office refuse l'authentification Basic du proxy). La liste de blocage
+  s'applique quand même (Copilot reste bloqué) et le Microsoft Store demande toujours le login.
 - **Page de blocage** « Homework time! » (en anglais) pour les sites en `http://`.
   Pour les sites en `https://`, le navigateur affiche sa propre page d'erreur
   (un navigateur n'affiche jamais une page envoyée par un proxy pour un site HTTPS).
@@ -102,7 +105,7 @@ cat /root/squid/.deployed-commit             # commit en place
 | [`bind/named.conf.options`](bind/named.conf.options) | DNS des clients VPN (requêtes amont en TCP) | `/etc/bind/` |
 | [`wireguard/wg0.conf.example`](wireguard/wg0.conf.example) | VPN (sans les clés) | `/etc/wireguard/wg0.conf` |
 | [`system/`](system/) | IPv6 désactivé, `resolv.conf` | `/etc/sysctl.d/`, `/etc/` |
-| [`Switch-proxy-ps1`](Switch-proxy-ps1), [`get-ssid.ps1`](get-ssid.ps1) | bascule automatique du proxy sur les PC Windows | `%LOCALAPPDATA%\ProxySwitch\` |
+| [`Switch-Proxy.ps1`](Switch-Proxy.ps1), [`get-ssid.ps1`](get-ssid.ps1) | bascule automatique du proxy sur les PC Windows | `%LOCALAPPDATA%\ProxySwitch\` |
 
 ## Documentation
 

@@ -331,6 +331,9 @@ youtubei.googleapis.com
 .genmirror.com
 .translate.goog
 .proxypool.top
+# YouTube unblock mirrors seen in proxy report 2026-10-19 (Antoine 19:02-19:20, Timothé 18:36-18:42, Chrome)
+.youtubeunblocked.live
+.unblockvideos.com
 
 # ---------------------------------------------------------------------------
 # Extension / app stores (VPN extensions and apps)
@@ -460,6 +463,8 @@ sites.google.com
 .unity3d.com
 # Game key / gift-card marketplace seen in proxy report 2026-10-17 (Antoine, 12:58, Chrome)
 .eneba.com
+# Y8 account / login network (id.net) seen in proxy report 2026-10-19 (Timothé, 18:28-18:29, Chrome)
+.id.net
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)
@@ -533,6 +538,16 @@ copilot.cloud.microsoft
 .eaglex.ic.gov
 .tmw-defender.pro
 .pushtorm.net
+# ---------------------------------------------------------------------------
+# Unidentified / suspected bypass sites (blocked on parent request)
+# ---------------------------------------------------------------------------
+# Seen in proxy report 2026-10-19 (Antoine, 19:11-19:21, Chrome, around youtubeunblocked.live)
+.rak8s.com
+.p23hxejm1.com
+.implinesdision.com
+.pocketapk.com
+# Seen in proxy report 2026-10-19 (Timothé, 19:05, Chrome): probable football streaming
+.futbol-max.com
 
 # ---------------------------------------------------------------------------
 # Gambling - whole top-level domains

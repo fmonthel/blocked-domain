@@ -460,6 +460,8 @@ sites.google.com
 .unity3d.com
 # Game key / gift-card marketplace seen in proxy report 2026-10-17 (Antoine, 12:58, Chrome)
 .eneba.com
+# Y8 account / login network (id.net) seen in proxy report 2026-10-19 (Timothé, 18:28-18:29, Chrome)
+.id.net
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

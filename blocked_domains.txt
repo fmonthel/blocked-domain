@@ -527,6 +527,8 @@ copilot.cloud.microsoft
 .talkie-ai.com
 .crushon.ai
 .candy.ai
+# Seen in proxy report 2026-10-20 (Timothé, 18:37-18:47, Chrome): AI detector + AI chat/paraphraser/humanizer suite
+.zerogpt.com
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)

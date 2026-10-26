@@ -529,6 +529,10 @@ copilot.cloud.microsoft
 .candy.ai
 # Seen in proxy report 2026-10-20 (Timothé, 18:37-18:47, Chrome): AI detector + AI chat/paraphraser/humanizer suite
 .zerogpt.com
+# Seen in proxy report 2026-10-25 (Timothé, 10:54-11:00, Chrome): AI chat / image generators, AI companion chatbot
+.deepai.org
+.freedomgpt.com
+.olabiba.com
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)

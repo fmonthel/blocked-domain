@@ -558,6 +558,14 @@ copilot.cloud.microsoft
 .pocketapk.com
 # Seen in proxy report 2026-10-19 (Timothé, 19:05, Chrome): probable football streaming
 .futbol-max.com
+# Seen in proxy report 2026-10-27 (Timothé, 17:42-17:49, Chrome, around unblockyoutube.co / proadblocker): throwaway redirect domains
+.savantwaxwing.cyou
+.khetglynn.com
+.reburysub.cfd
+.accidiafilmize.qpon
+.farnuq73xy.com
+.brizantor.info
+.servecontent.net
 
 # ---------------------------------------------------------------------------
 # Gambling - whole top-level domains

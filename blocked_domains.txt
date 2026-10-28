@@ -334,6 +334,8 @@ youtubei.googleapis.com
 # YouTube unblock mirrors seen in proxy report 2026-10-19 (Antoine 19:02-19:20, Timothé 18:36-18:42, Chrome)
 .youtubeunblocked.live
 .unblockvideos.com
+# YouTube unblock mirror seen in proxy report 2026-10-27 (Timothé, 17:49, Chrome)
+.unblockyoutube.co
 
 # ---------------------------------------------------------------------------
 # Extension / app stores (VPN extensions and apps)
@@ -465,6 +467,8 @@ sites.google.com
 .eneba.com
 # Y8 account / login network (id.net) seen in proxy report 2026-10-19 (Timothé, 18:28-18:29, Chrome)
 .id.net
+# Xbox Live multiplayer / gaming services seen in proxy report 2026-10-27 (Timothé, 17:00-17:04, Chrome)
+.xboxlive.com
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

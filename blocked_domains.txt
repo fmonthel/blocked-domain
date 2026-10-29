@@ -413,6 +413,8 @@ sites.google.com
 .miniplay.com
 .littlealchemy.com
 .basketballstarsonline.org
+# Browser game seen in proxy report 2026-10-28 (Antoine, 17:30, Chrome, during the now.gg session)
+.time-shooter.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -469,6 +471,8 @@ sites.google.com
 .id.net
 # Xbox Live multiplayer / gaming services seen in proxy report 2026-10-27 (Timothé, 17:00-17:04, Chrome)
 .xboxlive.com
+# Cloud gaming platform (Roblox and mobile games in the browser) seen in proxy report 2026-10-28 (Antoine, 17:30-17:36, Chrome)
+.now.gg
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

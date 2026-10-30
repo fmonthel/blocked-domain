@@ -625,6 +625,8 @@ copilot.cloud.microsoft
 .proline.ca
 # Casino affiliate seen in proxy report 2026-10-12 (Timothé, 14:49-14:50)
 .casinoplusinsider.com
+# Horse-racing betting tips (paris hippiques) seen in proxy report 2026-10-29 (Timothé, 16:28, Chrome)
+.zone-turf.fr
 
 # ---------------------------------------------------------------------------
 # Gambling - crypto casinos and skin / Roblox gambling

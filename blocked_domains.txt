@@ -161,6 +161,8 @@ youtubei.googleapis.com
 .veoh.com
 .streamable.com
 .coub.com
+# Documentary video site seen in proxy report 2026-10-30 (Timothé, 18:26-18:46, Chrome), blocked on parent request
+.watchdocumentaries.com
 
 # ---------------------------------------------------------------------------
 # Streaming services (remove this section to allow them)

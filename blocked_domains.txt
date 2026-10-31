@@ -415,6 +415,8 @@ sites.google.com
 .basketballstarsonline.org
 # Browser game seen in proxy report 2026-10-28 (Antoine, 17:30, Chrome, during the now.gg session)
 .time-shooter.com
+# Browser game seen in proxy report 2026-10-30 (Timothé, 18:38, Chrome, amid game-portal attempts)
+.geometryarrow.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

@@ -419,6 +419,8 @@ sites.google.com
 .time-shooter.com
 # Browser game seen in proxy report 2026-10-30 (Timothé, 18:38, Chrome, amid game-portal attempts)
 .geometryarrow.io
+# Unblocked-games / browser-games blog seen in proxy report 2026-10-31 (Antoine, 09:00, Chrome)
+.w3technic.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

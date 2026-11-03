@@ -423,6 +423,21 @@ sites.google.com
 .w3technic.com
 # 3D virtual-worlds / user-generated games platform (Spatial, app rated 17+) seen in proxy report 2026-11-01 (Timothé, 17:39-17:45, Chrome)
 .spatial.io
+# Browser games / game portals seen in proxy report 2026-11-02 (Antoine, Chrome): Retro Bowl mirror 07:38-08:06, yoplay.io 18:20-18:57, others during the 19:02-19:05 session
+.retrobowl.me
+.yoplay.io
+.drifted.com
+.madalin-cars-multiplayer.com
+.dynamonsworld.com
+# Game-related domains seen in proxy report 2026-11-02 (Antoine, 19:02-19:23, Chrome), blocked on parent request: Scratch mod used to run games, game payment/distribution platform, official site of a PC game
+.turbowarp.org
+.xsolla.com
+.xsolla.net
+.patrol-officers.com
+# Unconfirmed domains seen in proxy report 2026-11-02, blocked on parent request: wonderl.ink (Antoine, 19:04, Chrome), bluevoox.com (Antoine, 07:38-07:44, Chrome), mgsvp.com (Timothé, 16:18-17:31, Chrome)
+.wonderl.ink
+.bluevoox.com
+.mgsvp.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

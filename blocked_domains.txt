@@ -564,7 +564,7 @@ copilot.cloud.microsoft
 .deepai.org
 .freedomgpt.com
 .olabiba.com
-# Seen in proxy report 2026-11-04 (Timothé, 16:31, Chrome, right after zerogpt.com / quillbot.com attempts were blocked): AI text humanizer, AI detector
+# Seen in proxy report 2026-11-04 (Timothé, 16:31, Chrome, same session as blocked zerogpt.com / quillbot.com attempts): AI text humanizer, AI detector
 .humanizeai.pro
 .gptzero.me
 

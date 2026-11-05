@@ -564,6 +564,9 @@ copilot.cloud.microsoft
 .deepai.org
 .freedomgpt.com
 .olabiba.com
+# Seen in proxy report 2026-11-04 (Timothé, 16:31, Chrome, right after zerogpt.com / quillbot.com attempts were blocked): AI text humanizer, AI detector
+.humanizeai.pro
+.gptzero.me
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)
@@ -650,6 +653,8 @@ copilot.cloud.microsoft
 .casinoplusinsider.com
 # Horse-racing betting tips (paris hippiques) seen in proxy report 2026-10-29 (Timothé, 16:28, Chrome)
 .zone-turf.fr
+# Esports betting tips / odds and bonus comparison seen in proxy report 2026-11-04 (Antoine, 18:26, Chrome)
+.tips.gg
 
 # ---------------------------------------------------------------------------
 # Gambling - crypto casinos and skin / Roblox gambling

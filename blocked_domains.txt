@@ -568,6 +568,12 @@ copilot.cloud.microsoft
 .deepai.org
 .freedomgpt.com
 .olabiba.com
+# Seen in proxy report 2026-11-04 (Timothé, 16:31, Chrome, same session as blocked zerogpt.com / quillbot.com attempts): AI text humanizer, AI detector
+.humanizeai.pro
+.gptzero.me
+# AI writing assistant seen in proxy report 2026-11-04 (Timothé, 16:20-16:30, Chrome), blocked on parent request
+.grammarly.com
+.grammarly.io
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)
@@ -597,6 +603,10 @@ copilot.cloud.microsoft
 .farnuq73xy.com
 .brizantor.info
 .servecontent.net
+# Unidentified domains seen in proxy report 2026-11-04, blocked on parent request: wdfl.co (Timothé, 16:29, Chrome), alchemyx.online and floxis.tech (Antoine, 01:24-01:30, Chrome)
+.wdfl.co
+.alchemyx.online
+.floxis.tech
 
 # ---------------------------------------------------------------------------
 # Gambling - whole top-level domains
@@ -654,6 +664,8 @@ copilot.cloud.microsoft
 .casinoplusinsider.com
 # Horse-racing betting tips (paris hippiques) seen in proxy report 2026-10-29 (Timothé, 16:28, Chrome)
 .zone-turf.fr
+# Esports betting tips / odds and bonus comparison seen in proxy report 2026-11-04 (Antoine, 18:26, Chrome)
+.tips.gg
 
 # ---------------------------------------------------------------------------
 # Gambling - crypto casinos and skin / Roblox gambling

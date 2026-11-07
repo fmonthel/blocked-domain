@@ -440,6 +440,9 @@ sites.google.com
 .mgsvp.com
 # Retro Bowl mirror seen in proxy report 2026-11-03 (Antoine, 07:44, Chrome, right after retrobowl.me / retrobowl26.com attempts)
 .retrobowl2.me
+# Browser games seen in proxy report 2026-11-06 (Antoine, Chrome): Retro Bowl mirror 07:52-18:10, Galatrix puzzle game 07:40-07:44 (served alongside a CloudFront unblocked-games mirror)
+.retrobowlfree.io
+.galatrix.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

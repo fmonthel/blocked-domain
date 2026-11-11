@@ -443,6 +443,8 @@ sites.google.com
 # Browser games seen in proxy report 2026-11-06 (Antoine, Chrome): Retro Bowl mirror 07:52-18:10, Galatrix puzzle game 07:40-07:44 (served alongside a CloudFront unblocked-games mirror)
 .retrobowlfree.io
 .galatrix.com
+# Unblocked-games mirror seen in proxy report 2026-11-10 (Timothé, 20:31, Chrome)
+.classroom-6x.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -503,6 +505,11 @@ sites.google.com
 .xboxlive.com
 # Cloud gaming platform (Roblox and mobile games in the browser) seen in proxy report 2026-10-28 (Antoine, 17:30-17:36, Chrome)
 .now.gg
+# Stumble Guys (Scopely multiplayer game) and EasyFun cloud gaming platform seen in proxy report 2026-11-10 (Timothé, 20:51-20:59, Chrome)
+.stumbleguys.com
+.scopely.com
+.scopely.io
+.easyfun.gg
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

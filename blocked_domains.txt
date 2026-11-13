@@ -510,6 +510,8 @@ sites.google.com
 .scopely.com
 .scopely.io
 .easyfun.gg
+# Tall Team (Smash Karts studio) seen in proxy report 2026-11-11 (Timothé, 16:02, Chrome, during blocked smashkarts.io / poki.com attempts)
+.tall.team
 
 # ---------------------------------------------------------------------------
 # AI platforms (chatbots, image/video/music generators, AI companions)

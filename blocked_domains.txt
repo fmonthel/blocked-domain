@@ -445,6 +445,9 @@ sites.google.com
 .galatrix.com
 # Unblocked-games mirror seen in proxy report 2026-11-10 (Timothé, 20:31, Chrome)
 .classroom-6x.io
+# Russian browser-games portal (Igroutka, with its .su mirror) seen in proxy report 2026-11-13 (Antoine, 17:39, Chrome, amid kodub.com / Unity game attempts)
+.igroutka.ru
+.igroutka.su
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

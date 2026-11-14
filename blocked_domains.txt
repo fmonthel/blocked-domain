@@ -448,6 +448,8 @@ sites.google.com
 # Russian browser-games portal (Igroutka, with its .su mirror) seen in proxy report 2026-11-13 (Antoine, 17:39, Chrome, amid kodub.com / Unity game attempts)
 .igroutka.ru
 .igroutka.su
+# GitHub Pages two-player browser-games site, blocked on parent request (2026-11-14); only this subdomain, not github.io
+.2player-online.github.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

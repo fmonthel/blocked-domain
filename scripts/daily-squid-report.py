@@ -60,8 +60,20 @@ GROUPS = [("browser", "Navigateurs internet", "Chrome, Edge, Firefox, Opera, Saf
           ("unknown", "Source non déterminée", "trafic enregistré avant l'activation du suivi des navigateurs")]
 
 
+# Shared hosting / free-subdomain platforms: each subdomain is a different site
+# (e.g. xxx.github.io), so the report keeps the full host name instead of grouping.
+SHARED_HOSTS = ("github.io", "gitlab.io", "pages.dev", "workers.dev", "netlify.app", "vercel.app",
+                "web.app", "firebaseapp.com", "glitch.me", "onrender.com", "replit.app", "repl.co",
+                "surge.sh", "neocities.org", "itch.io", "weebly.com", "wixsite.com", "blogspot.com",
+                "cloudfront.net", "herokuapp.com", "fly.dev", "deno.dev", "codeberg.page")
+
+
 def regdomain(host):
-    labels = host.lower().rstrip(".").split(".")
+    host = host.lower().rstrip(".")
+    for suffix in SHARED_HOSTS:
+        if host.endswith("." + suffix):
+            return re.sub(r"^www\.", "", host)
+    labels = host.split(".")
     if len(labels) >= 3 and labels[-2] in SECOND_LEVEL and len(labels[-1]) == 2:
         return ".".join(labels[-3:])
     return ".".join(labels[-2:])

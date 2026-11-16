@@ -450,6 +450,8 @@ sites.google.com
 .igroutka.su
 # GitHub Pages two-player browser-games site, blocked on parent request (2026-11-14); only this subdomain, not github.io
 .2player-online.github.io
+# GitHub Pages unblocked-games mirror ("UBG Hyper") seen in proxy report 2026-11-15 (Antoine, 11:03-11:13, Chrome, amid an ad-tech burst); only this subdomain, not github.io
+.ubghyper.github.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

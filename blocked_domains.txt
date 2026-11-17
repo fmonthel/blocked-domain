@@ -452,6 +452,9 @@ sites.google.com
 .2player-online.github.io
 # GitHub Pages unblocked-games mirror ("UBG Hyper") seen in proxy report 2026-11-15 (Antoine, 11:03-11:13, Chrome, amid an ad-tech burst); only this subdomain, not github.io
 .ubghyper.github.io
+# GitHub Pages unblocked-games mirrors seen in proxy report 2026-11-16 (Antoine, Chrome, amid ~930 blocked ubghyper.github.io attempts): 23azo games store 07:34-10:23, freeonlinewebtools game shards 10:47; only these subdomains, not github.io
+.23azostore.github.io
+.freeonlinewebtools.github.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

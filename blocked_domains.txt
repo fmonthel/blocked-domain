@@ -596,6 +596,8 @@ copilot.cloud.microsoft
 # AI writing assistant seen in proxy report 2026-11-04 (Timothé, 16:20-16:30, Chrome), blocked on parent request
 .grammarly.com
 .grammarly.io
+# French AI chatbot aggregator seen in proxy report 2026-11-22 (Timothé, 10:37, Chrome, same day as blocked gemini.google.com / claude.ai / chatgpt.com attempts)
+.yiaho.com
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)

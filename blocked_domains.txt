@@ -455,6 +455,11 @@ sites.google.com
 # GitHub Pages unblocked-games mirrors seen in proxy report 2026-11-16 (Antoine, Chrome, amid ~930 blocked ubghyper.github.io attempts): 23azo games store 07:34-10:23, freeonlinewebtools game shards 10:47; only these subdomains, not github.io
 .23azostore.github.io
 .freeonlinewebtools.github.io
+# Unblocked-games portals / browser games seen in proxy report 2026-11-23 (Timothé, 16:17-17:00, Chrome, amid blocked wgplayer / gamedistribution / unblocked-games attempts): FreezeNova portal 16:17-16:33, DuckMath (games site disguised as math) 16:30, Slope 3 16:39-17:00, Snow Rider GitHub Pages mirror 16:43 (only this subdomain, not github.io)
+.freezenova.com
+.duckmath.org
+.slope3.com
+.tsnowrider.github.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -479,6 +484,9 @@ sites.google.com
 .basketball-stars.io
 # Agar.io clone seen in proxy report 2026-11-03 (Antoine, 07:43, Chrome)
 .agar.cc
+# Snow Rider 3D browser game sites seen in proxy report 2026-11-23 (Timothé, 16:32-16:39, Chrome)
+.snow-rider.io
+.snow-rider3d.io
 
 # ---------------------------------------------------------------------------
 # Games - platforms, launchers and multiplayer services

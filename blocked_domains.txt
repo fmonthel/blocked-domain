@@ -479,6 +479,12 @@ sites.google.com
 .basketball-stars.io
 # Agar.io clone seen in proxy report 2026-11-03 (Antoine, 07:43, Chrome)
 .agar.cc
+# Browser .io games seen in proxy report 2026-11-21 (Antoine, 11:26-11:46, Chrome, alongside game ad networks cpmstar / venatus): FallZone.io 11:28-11:41, Slice Master 11:26, TurBall.io 11:45-11:46, Poke Survivor 11:45, Wave Race 11:46
+.fallzone.io
+.slice-master.io
+.turball.io
+.poke-survivor.io
+.waverace.org
 
 # ---------------------------------------------------------------------------
 # Games - platforms, launchers and multiplayer services

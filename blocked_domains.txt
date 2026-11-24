@@ -484,6 +484,12 @@ sites.google.com
 .basketball-stars.io
 # Agar.io clone seen in proxy report 2026-11-03 (Antoine, 07:43, Chrome)
 .agar.cc
+# Browser .io games seen in proxy report 2026-11-21 (Antoine, 11:26-11:46, Chrome, alongside game ad networks cpmstar / venatus): FallZone.io 11:28-11:41, Slice Master 11:26, TurBall.io 11:45-11:46, Poke Survivor 11:45, Wave Race 11:46
+.fallzone.io
+.slice-master.io
+.turball.io
+.poke-survivor.io
+.waverace.org
 # Snow Rider 3D browser game sites seen in proxy report 2026-11-23 (Timothé, 16:32-16:39, Chrome)
 .snow-rider.io
 .snow-rider3d.io
@@ -604,6 +610,8 @@ copilot.cloud.microsoft
 # AI writing assistant seen in proxy report 2026-11-04 (Timothé, 16:20-16:30, Chrome), blocked on parent request
 .grammarly.com
 .grammarly.io
+# French AI chatbot aggregator seen in proxy report 2026-11-22 (Timothé, 10:37, Chrome, same day as blocked gemini.google.com / claude.ai / chatgpt.com attempts)
+.yiaho.com
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)

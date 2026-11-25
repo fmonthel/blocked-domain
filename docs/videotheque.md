@@ -1,7 +1,8 @@
 # Vidéothèque (Video Library)
 
 Copie locale de chaînes YouTube éducatives sur **nicomaque**, servie par un site façon YouTube
-(interface en anglais) et accessible aux enfants **uniquement via le proxy**, avec leurs comptes du proxy.
+(interface en anglais). Pas de connexion : les enfants y passent par le proxy (déjà authentifié) ; les
+accès extérieurs directs sont limités et surveillés (voir « Protection contre les abus »).
 
 ## Ajouter / retirer une chaîne
 
@@ -21,9 +22,11 @@ Seul l'onglet « Vidéos » est copié (pas de Shorts, pas de directs), en 720p 
 |---|---|
 | `videotheque/chaines.conf` | `/opt/videotheque/chaines.conf` |
 | `videotheque/vt-sync.py` | `/opt/videotheque/vt-sync.py` |
-| `videotheque/vt-htpasswd.sh` | `/opt/videotheque/vt-htpasswd.sh` |
+| `videotheque/vt-trusted.sh` | `/opt/videotheque/vt-trusted.sh` |
 | `videotheque/videotheque.cron` | `/etc/cron.d/videotheque` |
 | `videotheque/nginx-videotheque.conf` | `/etc/nginx/sites-available/videotheque` |
+| `videotheque/fail2ban-videotheque.conf` | `/etc/fail2ban/jail.d/videotheque.conf` |
+| `videotheque/fail2ban-filter-videotheque-scan.conf` | `/etc/fail2ban/filter.d/videotheque-scan.conf` |
 | `videotheque/web/*` | `/opt/videotheque/web/` |
 
 `sync-from-github.sh` n'installe ces fichiers que si `/etc/videotheque/enabled` existe (préparation unique du
@@ -32,10 +35,36 @@ QuickJS-NG `/usr/local/bin/qjs`, utilisateur `videotheque`, pare-feu 8090). aphr
 
 ## Accès
 
-- Site : `http://<nom public de nicomaque>:8090/` — port 8090 redirigé par le routeur vers nicomaque.
-- Connexion : mêmes comptes que le proxy (`vt-htpasswd.sh` copie `/etc/squid/passwords` toutes les 15 min).
+- Site : `http://videos.flox-arts.net:8090/` — port 8090 redirigé par le routeur vers nicomaque. Pas de connexion.
 - Via le proxy de nicomaque : `/etc/hosts` de nicomaque fait pointer le nom vers 127.0.0.1 (pas de NAT loopback).
-- Via le proxy d'aphrodite : passage par le port public.
+- Via le proxy d'aphrodite, ou depuis l'extérieur : passage par le port public.
+- Via le VPN de nicomaque : BIND (zone RPZ locale `/etc/bind/db.rpz.local`, propre au serveur) répond
+  `192.168.18.245` pour ce nom.
+- À la maison **sans** proxy : `http://192.168.18.245:8090/` (le routeur Nokia d'EBOX ne fait pas de NAT
+  loopback et son réglage DNS est verrouillé).
+
+## Protection contre les abus
+
+Sources **de confiance**, jamais limitées ni bannies : proxy de nicomaque (127.0.0.1), réseau de la maison
+(192.168.18.0/24), VPN (10.10.10.0/24) et IP publique d'aphrodite (son proxy ; IP dynamique résolue toutes les
+5 min par `vt-trusted.sh`). On se fie à l'IP source, pas aux en-têtes `Via` / `X-Forwarded-For` (falsifiables).
+nginx note dans le journal `1` (confiance) ou `0` (extérieur) en 2e champ.
+
+Pour l'**extérieur** :
+
+| Protection | Règle |
+|---|---|
+| nginx : pages, catalogue, miniatures | 10 requêtes/s par IP (rafale 60), sinon 429 |
+| nginx : vidéos | 4 connexions simultanées, 1 Mo/s par connexion (720p ≈ 0,15 Mo/s) |
+| fail2ban `videotheque-limit` | bannie 1 h (croissant) après 20 refus 429 en 1 min |
+| fail2ban `videotheque-scan` | bannie après 15 erreurs (400/403/404/405) en 10 min (robots `/wp-login`, `/.env`…) |
+| server-watch | alerte par courriel si le trafic extérieur dépasse 3 Go en 1 h, ou si le site ou la synchro de nuit ne vont pas |
+
+```bash
+fail2ban-client status videotheque-limit ; fail2ban-client status videotheque-scan
+fail2ban-client set videotheque-scan unbanip <IP>     # débannir
+awk '$2==0' /var/log/nginx/videotheque.access.log | tail   # requêtes extérieures
+```
 
 ## Sur le serveur
 
@@ -56,4 +85,4 @@ yt-dlp est mis à jour chaque lundi (`pip install -U "yt-dlp[default]"`). Si `st
 et relancer une synchro limitée. yt-dlp utilise QuickJS-NG comme moteur JavaScript (nicomaque est en i686 :
 pas de deno ni de node ≥ 22).
 
-Usage strictement familial et privé (connexion obligatoire) : les vidéos ne sont pas redistribuées.
+Usage strictement familial et privé : les vidéos ne sont pas redistribuées ; l'adresse n'est pas publiée.

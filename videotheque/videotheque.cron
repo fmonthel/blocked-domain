@@ -1,0 +1,11 @@
+# /etc/cron.d/videotheque - installé par sync-from-github.sh (uniquement si /etc/videotheque/enabled existe)
+# (source : videotheque/videotheque.cron dans le dépôt GitHub)
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# copie des nouvelles vidéos chaque nuit (budget et durée limités, voir vt-sync.py)
+30 1 * * *   videotheque /usr/bin/python3 -B /opt/videotheque/vt-sync.py >> /var/log/videotheque/vt-sync.log 2>&1
+# yt-dlp doit suivre les changements de YouTube : mise à jour chaque lundi avant la synchro
+10 1 * * 1   root /opt/videotheque/venv/bin/pip install -q -U "yt-dlp[default]" >> /var/log/videotheque/pip.log 2>&1
+# IP publiques des autres proxys (dynamiques) = sources de confiance pour nginx
+*/5 * * * *  root /opt/videotheque/vt-trusted.sh

@@ -36,18 +36,20 @@ QuickJS-NG `/usr/local/bin/qjs`, utilisateur `videotheque`, pare-feu 8090). aphr
 ## Accès
 
 - Site : `http://videos.flox-arts.net:8090/` — port 8090 redirigé par le routeur vers nicomaque. Pas de connexion.
-- Via le proxy de nicomaque : `/etc/hosts` de nicomaque fait pointer le nom vers 127.0.0.1 (pas de NAT loopback).
-- Via le proxy d'aphrodite, ou depuis l'extérieur : passage par le port public.
+- La même adresse marche partout : à la maison (le routeur Nokia d'EBOX fait du NAT loopback, testé le
+  2026-11-24 : les appareils de la maison arrivent avec l'IP publique de la maison), à l'extérieur, via les
+  proxys et via le VPN.
+- Via le proxy de nicomaque : `/etc/hosts` de nicomaque fait pointer le nom vers 127.0.0.1 (trafic local).
 - Via le VPN de nicomaque : BIND (zone RPZ locale `/etc/bind/db.rpz.local`, propre au serveur) répond
   `192.168.18.245` pour ce nom.
-- À la maison **sans** proxy : `http://192.168.18.245:8090/` (le routeur Nokia d'EBOX ne fait pas de NAT
-  loopback et son réglage DNS est verrouillé).
+- Secours à la maison : `http://192.168.18.245:8090/`.
 
 ## Protection contre les abus
 
 Sources **de confiance**, jamais limitées ni bannies : proxy de nicomaque (127.0.0.1), réseau de la maison
-(192.168.18.0/24), VPN (10.10.10.0/24) et IP publique d'aphrodite (son proxy ; IP dynamique résolue toutes les
-5 min par `vt-trusted.sh`). On se fie à l'IP source, pas aux en-têtes `Via` / `X-Forwarded-For` (falsifiables).
+(192.168.18.0/24), VPN (10.10.10.0/24), IP publique d'aphrodite (son proxy) et IP publique de la maison
+(appareils de la maison via le NAT loopback du routeur) ; ces deux IP dynamiques sont résolues toutes les
+5 min par `vt-trusted.sh`. On se fie à l'IP source, pas aux en-têtes `Via` / `X-Forwarded-For` (falsifiables).
 nginx note dans le journal `1` (confiance) ou `0` (extérieur) en 2e champ.
 
 Pour l'**extérieur** :

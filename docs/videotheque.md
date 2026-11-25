@@ -49,18 +49,24 @@ Seul l'onglet « Vidéos » est copié (pas de Shorts, pas de directs), en 720p 
 
 `sync-from-github.sh` n'installe ces fichiers que si `/etc/videotheque/enabled` existe (préparation unique du
 serveur, faite hors dépôt : volume `/srv/videotheque`, nginx, ffmpeg, yt-dlp dans `/opt/videotheque/venv`,
-QuickJS-NG `/usr/local/bin/qjs`, utilisateur `videotheque`, pare-feu 8090). aphrodite les ignore.
+QuickJS-NG `/usr/local/bin/qjs`, utilisateur `videotheque`, certbot et certificat Let's Encrypt, petit site nginx « acme » sur le port 80,
+pare-feu 80/443). aphrodite les ignore. Le site du dépôt exige le certificat : il doit exister avant le
+premier déploiement (sinon `nginx -t` échoue et la synchro garde l'ancienne version).
 
 ## Accès
 
-- Site : `http://videos.flox-arts.net:8090/` — port 8090 redirigé par le routeur vers nicomaque. Pas de connexion.
+- Site : `https://videos.flox-arts.net/` — ports 443 et 80 redirigés par le routeur vers nicomaque. Pas de connexion.
+  Certificat Let's Encrypt renouvelé automatiquement (`certbot.timer`, méthode webroot `/var/www/letsencrypt`,
+  nginx rechargé après chaque renouvellement). Le port 80 ne sert qu'aux vérifications de Let's Encrypt et
+  redirige tout le reste vers https. L'ancien port 8090 n'existe plus.
 - La même adresse marche partout : à la maison (le routeur Nokia d'EBOX fait du NAT loopback, testé le
   2026-11-24 : les appareils de la maison arrivent avec l'IP publique de la maison), à l'extérieur, via les
   proxys et via le VPN.
 - Via le proxy de nicomaque : `/etc/hosts` de nicomaque fait pointer le nom vers 127.0.0.1 (trafic local).
 - Via le VPN de nicomaque : BIND (zone RPZ locale `/etc/bind/db.rpz.local`, propre au serveur) répond
   `192.168.18.245` pour ce nom.
-- Secours à la maison : `http://192.168.18.245:8090/`.
+- Via les proxys (Squid) : `CONNECT videos.flox-arts.net:443`, autorisé comme tout site https.
+- Secours à la maison : `https://192.168.18.245/` (avertissement de certificat : le nom ne correspond pas).
 
 ## Protection contre les abus
 
@@ -78,11 +84,12 @@ Pour l'**extérieur** :
 | nginx : vidéos | 4 connexions simultanées, 1 Mo/s par connexion (720p ≈ 0,15 Mo/s) |
 | fail2ban `videotheque-limit` | bannie 1 h (croissant) après 20 refus 429 en 1 min |
 | fail2ban `videotheque-scan` | bannie après 15 erreurs (400/403/404/405) en 10 min (robots `/wp-login`, `/.env`…) |
-| server-watch | alerte par courriel si le trafic extérieur dépasse 3 Go en 1 h, ou si le site ou la synchro de nuit ne vont pas |
+| server-watch | alerte par courriel si le trafic extérieur dépasse 3 Go en 1 h, si le site ou la synchro de nuit ne vont pas, ou si le certificat expire dans moins de 14 jours |
 
 ```bash
 fail2ban-client status videotheque-limit ; fail2ban-client status videotheque-scan
 fail2ban-client set videotheque-scan unbanip <IP>     # débannir
+certbot certificates                                  # expiration du certificat
 awk '$2==0' /var/log/nginx/videotheque.access.log | tail   # requêtes extérieures
 ```
 

@@ -1,11 +1,14 @@
 #!/bin/bash
-# Vidéothèque : IP publiques des AUTRES proxys de la famille (connexion obligatoire chez eux),
-# traitées par nginx comme sources de confiance : jamais limitées, et marquées « 1 » dans le
-# journal, donc ignorées par fail2ban et par la supervision.
+# Vidéothèque : IP publiques de la famille traitées par nginx comme sources de confiance : jamais
+# limitées, et marquées « 1 » dans le journal, donc ignorées par fail2ban et par la supervision.
+#  - aphrodite : son proxy (connexion obligatoire) arrive avec l'IP publique d'aphrodite ;
+#  - nicomaque : le routeur de la maison fait du NAT loopback, les appareils de la maison qui
+#    utilisent l'adresse publique arrivent avec l'IP publique de la maison. Sans cette ligne, la
+#    maison entière pourrait être limitée, voire bannie par fail2ban.
 # Ces IP sont dynamiques (No-IP) : résolues toutes les 5 min (cron) ; nginx n'est rechargé que
-# si elles ont changé. Proxy local (127.0.0.1), maison et VPN : déjà dans nginx-videotheque.conf.
+# si elles ont changé. Proxy local (127.0.0.1), LAN et VPN : déjà dans nginx-videotheque.conf.
 set -u
-HOSTS="nk-j8b3b7.flox-arts.net"          # aphrodite
+HOSTS="nk-j8b3b7.flox-arts.net nk-h2k4g2.flox-arts.net"   # aphrodite, nicomaque (maison)
 OUT=/etc/nginx/videotheque-trusted.conf
 TMP=$(mktemp)
 for h in $HOSTS; do

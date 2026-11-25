@@ -1,15 +1,14 @@
 // /etc/bind/named.conf.options - DNS resolver for WireGuard clients (10.10.10.1)
-// and for the home network (192.168.18.0/24) when the router hands out this server as DNS.
 options {
 	directory "/var/cache/bind";
 	dnssec-validation auto;
 	listen-on-v6 { any; };
-	allow-recursion { 127.0.0.1; 10.10.10.0/24; 192.168.18.0/24; };
+	allow-recursion { 127.0.0.1; 10.10.10.0/24; };
 
-	// Local overrides (split-horizon): names answered with a LAN address on this server only,
-	// e.g. videos.flox-arts.net -> nicomaque's LAN IP, because the router has no NAT loopback.
-	// The zone file is per server and NOT in this repo: /etc/bind/db.rpz.local
-	// (records on nicomaque, empty on aphrodite). Everything else is resolved normally.
+	// Local overrides (split-horizon) for VPN clients: names answered with a LAN address on this
+	// server only, e.g. videos.flox-arts.net -> nicomaque's LAN IP, because the router has no NAT
+	// loopback. The zone file is per server and NOT in this repo: /etc/bind/db.rpz.local
+	// (records on nicomaque, empty on aphrodite; it must exist). Everything else is resolved normally.
 	response-policy { zone "rpz.local"; };
 };
 

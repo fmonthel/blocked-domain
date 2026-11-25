@@ -92,14 +92,26 @@ function home() {
     .sort((a, b) => b[1].at - a[1].at).slice(0, 12).map(([id]) => BY_ID.get(id));
   let html = '';
   if (cont.length) html += section('Continue watching', cont, '#/history');
-  html += section('Latest videos', LIB.videos.slice(0, 15));
-  for (const c of LIB.channels) {
-    const vids = BY_CH.get(c.id) || [];
-    if (!vids.length) continue;
-    html += section(esc(c.name), vids.slice(0, 15), `#/c/${encodeURIComponent(c.id)}`, c);
-  }
-  if (!LIB.videos.length) html = '<div class="empty">No videos yet: the library is filled every night.</div>';
+  const chans = LIB.channels.filter(c => (BY_CH.get(c.id) || []).length);
+  html += `<section class="section"><div class="section-head"><h2>Channels</h2></div>
+    <div class="channels">${chans.map(channelCard).join('')}</div></section>`;
+  if (!chans.length) html = '<div class="empty">No videos yet: the library is filled every night.</div>';
   app.innerHTML = html;
+}
+// carte de chaîne de l'accueil : bannière, avatar, nom, nombre de vidéos, pastille « nouveau » (< 7 jours)
+function channelCard(c) {
+  const vids = BY_CH.get(c.id) || [], p = progress();
+  const weekAgo = Date.now() - 7 * 86400000;
+  const fresh = vids.filter(v => { const d = toDate(v.d); return d && d >= weekAgo && !(p[v.id] && p[v.id].done); }).length;
+  const seen = vids.filter(v => p[v.id] && p[v.id].done).length;
+  const last = vids[0];
+  return `<a class="chan-card" href="#/c/${encodeURIComponent(c.id)}">
+    <div class="chan-banner"${c.banner ? ` style="background-image:url('${esc(c.banner)}')"` : ''}>
+      ${fresh ? `<span class="badge">${fresh} new</span>` : ''}</div>
+    <div class="chan-body">${avatar(c)}<div>
+      <h3>${esc(c.name)}</h3>
+      <p>${plural(vids.length, 'video')}${seen ? ` • ${seen} watched` : ''}</p>
+      ${last ? `<p>Latest: ${ago(last.d)}</p>` : ''}</div></div></a>`;
 }
 function section(title, vids, moreHref, c) {
   return `<section class="section"><div class="section-head">${c ? `<a href="${moreHref}">${avatar(c)}</a>` : ''}

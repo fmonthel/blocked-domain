@@ -16,12 +16,30 @@ ex. `https://www.youtube.com/@YMONKA`). Après fusion :
 Une chaîne retirée disparaît du site ; ses fichiers restent sur le serveur (suppression à la demande).
 Seul l'onglet « Vidéos » est copié (pas de Shorts, pas de directs), en 720p maximum (H.264, pas de réencodage).
 
+### Mode « à la demande » (grosses chaînes)
+
+`https://www.youtube.com/@Chaine  mode=demand  keep=10  expire=30`
+
+- Chaque nuit : catalogue complet (titres, durées) et miniatures **copiées sur nicomaque** (ytimg.com reste
+  bloqué pour les enfants), plus les `keep` vidéos les plus récentes.
+- Les autres vidéos portent l'étiquette « On demand » : au premier clic, le site affiche « Preparing your
+  video… » avec l'avancement (~1 min pour une vidéo de 8 min), puis la lance. Les clics suivants sont instantanés.
+- Une vidéo non regardée depuis `expire` jours est effacée (sauf les `keep` plus récentes) ; elle reste au
+  catalogue et sera recopiée au prochain clic.
+- Service `videotheque-demande` (`vt-demande.py`, 127.0.0.1:8091, nginx `/api/`) : n'accepte que les vidéos
+  du catalogue d'une chaîne « demand » (impossible de faire télécharger une autre vidéo YouTube), une à la
+  fois, file de 5, 60 par jour au plus.
+- YouTube reste entièrement bloqué par le proxy : c'est nicomaque qui télécharge, les enfants ne voient
+  que la vidéothèque.
+
 ## Fichiers du dépôt → serveur
 
 | Dépôt | Installé dans |
 |---|---|
 | `videotheque/chaines.conf` | `/opt/videotheque/chaines.conf` |
 | `videotheque/vt-sync.py` | `/opt/videotheque/vt-sync.py` |
+| `videotheque/vt-demande.py` | `/opt/videotheque/vt-demande.py` |
+| `videotheque/videotheque-demande.service` | `/etc/systemd/system/videotheque-demande.service` |
 | `videotheque/vt-trusted.sh` | `/opt/videotheque/vt-trusted.sh` |
 | `videotheque/videotheque.cron` | `/etc/cron.d/videotheque` |
 | `videotheque/nginx-videotheque.conf` | `/etc/nginx/sites-available/videotheque` |
@@ -75,6 +93,8 @@ tail -f /var/log/videotheque/vt-sync.log              # dernière synchro
 cat /srv/videotheque/status.json                      # bilan (lu par la supervision)
 sudo -u videotheque python3 -B /opt/videotheque/vt-sync.py --max 5    # synchro manuelle limitée
 sudo -u videotheque python3 -B /opt/videotheque/vt-sync.py --index-only  # reconstruire library.json
+curl -s http://127.0.0.1:8091/api/health                # service à la demande (file, nb du jour)
+journalctl -u videotheque-demande -n 20                 # téléchargements à la demande
 ```
 
 Réglages propres au serveur (facultatif) : `/etc/videotheque/local.conf`, section `[vt]` :

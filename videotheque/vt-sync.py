@@ -2,13 +2,18 @@
 """Vidéothèque : copie locale des chaînes YouTube listées dans chaines.conf.
 
 Lancé chaque nuit par /etc/cron.d/videotheque (utilisateur « videotheque »).
-1. Pour chaque chaîne : nom, avatar et bannière (une fois par semaine).
-2. Passe « nouveautés » : les vidéos plus récentes que la dernière déjà copiée (--break-on-existing).
-3. Passe « rattrapage » : tant qu'une chaîne n'est pas complète (première copie), ou le dimanche
-   pour toutes, on remonte l'historique avec le budget restant de la nuit.
-4. Reconstruit library.json (lu par le site) et status.json (lu par la supervision).
 
-720p max, H.264 + AAC en mp4 : simple remux par ffmpeg, aucun réencodage (le Celeron ne suivrait pas).
+Deux modes par chaîne (options sur la ligne de chaines.conf) :
+- complet (défaut) : toute la chaîne est copiée.
+    1. passe « nouveautés » : vidéos plus récentes que la dernière copiée (--break-on-existing) ;
+    2. passe « rattrapage » : tant que la chaîne n'est pas complète, ou le dimanche, on remonte
+       l'historique avec le budget restant de la nuit.
+- demand : seul le catalogue (titres, durées, miniatures copiées en local) est récupéré chaque nuit,
+    avec les `keep` vidéos les plus récentes. Les autres sont téléchargées au premier clic par
+    vt-demande.py, puis effacées après `expire` jours sans visionnage (journal nginx).
+
+Ensuite : reconstruit library.json (lu par le site) et status.json (lu par la supervision).
+720p max, H.264 + AAC en mp4 : simple remux, aucun réencodage (le Celeron ne suivrait pas).
 Pause de 15 à 45 s entre deux vidéos et budget par nuit pour ne pas se faire bloquer par YouTube.
 
 Réglages locaux facultatifs : /etc/videotheque/local.conf
@@ -17,9 +22,9 @@ Réglages locaux facultatifs : /etc/videotheque/local.conf
     duree_max_heures = 5
     hauteur_max = 720
 
-Usage : vt-sync.py [--index-only] [--max N]
+Usage : vt-sync.py [--index-only] [--max N] [--conf FICHIER]
 """
-import configparser, datetime as dt, fcntl, json, os, re, subprocess, sys, time, urllib.request
+import configparser, datetime as dt, fcntl, glob, json, os, re, subprocess, sys, time, urllib.request
 
 BASE = "/srv/videotheque"
 MEDIA = f"{BASE}/media"
@@ -29,10 +34,12 @@ LIBRARY = f"{BASE}/library.json"
 STATUS = f"{BASE}/status.json"
 CHANNELS_CONF = "/opt/videotheque/chaines.conf"
 LOCAL_CONF = "/etc/videotheque/local.conf"
+NGINX_LOGS = ["/var/log/nginx/videotheque.access.log", "/var/log/nginx/videotheque.access.log.1"]
 YTDLP = "/opt/videotheque/venv/bin/yt-dlp"
 QJS = "/usr/local/bin/qjs"
 NEW_PER_CHANNEL = 30           # passe nouveautés : au plus N vidéos par chaîne et par nuit
 DESC_MAX = 1500                # description gardée dans library.json
+THUMBS_PER_NIGHT = 600         # miniatures du catalogue (mode demand) copiées par nuit au plus
 
 
 def log(msg):
@@ -47,14 +54,20 @@ def settings():
     return {"max": get("max_par_nuit", 150), "hours": get("duree_max_heures", 5), "height": get("hauteur_max", 720)}
 
 
-def read_channels():
-    urls = []
-    with open(CHANNELS_CONF, encoding="utf-8") as f:
+def read_channels(path):
+    """Une chaîne par ligne : URL [mode=demand] [keep=10] [expire=30]."""
+    chans = []
+    with open(path, encoding="utf-8") as f:
         for line in f:
-            line = line.split("#", 1)[0].strip()
-            if line:
-                urls.append(line.rstrip("/").removesuffix("/videos").removesuffix("/featured"))
-    return urls
+            parts = line.split("#", 1)[0].split()
+            if not parts:
+                continue
+            url = parts[0].rstrip("/").removesuffix("/videos").removesuffix("/featured")
+            opt = dict(p.split("=", 1) for p in parts[1:] if "=" in p)
+            mode = "demand" if opt.get("mode", "").lower() in ("demand", "demande") else "full"
+            chans.append({"url": url, "mode": mode,
+                          "keep": int(opt.get("keep", 10)), "expire": int(opt.get("expire", 30))})
+    return chans
 
 
 def load_json(path, default):
@@ -118,14 +131,16 @@ def channel_info(url, chs):
                 fetch(u, f"{d}/{kind}.jpg")
             except Exception as e:  # image facultative
                 log(f"  {kind} non téléchargé: {e}")
-    info = {"id": cid, "name": j.get("channel") or j.get("title") or cid,
-            "handle": j.get("uploader_id") or "", "desc": (j.get("description") or "")[:DESC_MAX],
-            "complete": known.get("complete", False), "meta_ts": time.time()}
+    info = dict(known)
+    info.update({"id": cid, "name": j.get("channel") or j.get("title") or cid,
+                 "handle": j.get("uploader_id") or "", "desc": (j.get("description") or "")[:DESC_MAX],
+                 "meta_ts": time.time()})
+    info.setdefault("complete", False)
     save_json(f"{d}/channel.json", info)
     return info
 
 
-def download(url, max_dl, deadline, break_on_existing, height):
+def download(url, max_dl, deadline, break_on_existing, height, items=None):
     """Lance yt-dlp sur l'onglet Vidéos. Retourne (nouvelles vidéos, terminé, erreur fatale)."""
     if max_dl <= 0 or time.time() >= deadline:
         return 0, False, None
@@ -143,6 +158,8 @@ def download(url, max_dl, deadline, break_on_existing, height):
     ]
     if break_on_existing:
         cmd.append("--break-on-existing")
+    if items:
+        cmd += ["--playlist-items", items]
     cmd.append(url + "/videos")
     before = archive_count()
     tail, fatal = [], None
@@ -170,6 +187,89 @@ def download(url, max_dl, deadline, break_on_existing, height):
     return new, finished, fatal
 
 
+# ---------------------------------------------------------------- mode « demand »
+
+def update_catalog(url, cid, deadline):
+    """Catalogue complet de la chaîne (sans télécharger les vidéos) + miniatures copiées en local
+    (ytimg.com est bloqué pour les enfants). Retourne le nombre de vidéos du catalogue."""
+    r = subprocess.run(ytdlp_base() + ["--flat-playlist", "-J", url + "/videos"],
+                       capture_output=True, text=True, timeout=1800)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.strip()[-300:] or "catalogue illisible")
+    entries = [e for e in json.loads(r.stdout).get("entries") or [] if e.get("id")]
+    cat = [{"id": e["id"], "t": e.get("title") or "", "l": int(e.get("duration") or 0)} for e in entries]
+    d = f"{MEDIA}/{cid}"
+    os.makedirs(f"{d}/thumbs", exist_ok=True)
+    save_json(f"{d}/catalog.json", cat)
+    got = 0
+    for e in cat:
+        dest = f"{d}/thumbs/{e['id']}.jpg"
+        if os.path.exists(dest) or got >= THUMBS_PER_NIGHT or time.time() > deadline:
+            continue
+        try:
+            fetch(f"https://i.ytimg.com/vi/{e['id']}/mqdefault.jpg", dest)
+            got += 1
+            time.sleep(0.2)
+        except Exception:
+            pass
+    log(f"  catalogue : {len(cat)} vidéos, {got} miniature(s) copiée(s)")
+    return len(cat)
+
+
+def views_from_nginx(state):
+    """Dernier visionnage de chaque vidéo (requêtes .mp4 dans le journal nginx)."""
+    seen = state.setdefault("seen", {})
+    rx = re.compile(r'\[([^\]]+)\] "GET /media/[^/]+/\d*_([A-Za-z0-9_-]{11})\.mp4')
+    for path in NGINX_LOGS:
+        try:
+            with open(path, errors="replace") as f:
+                for line in f:
+                    m = rx.search(line)
+                    if not m:
+                        continue
+                    try:
+                        ts = dt.datetime.strptime(m.group(1), "%d/%b/%Y:%H:%M:%S %z").timestamp()
+                    except ValueError:
+                        continue
+                    if ts > seen.get(m.group(2), 0):
+                        seen[m.group(2)] = ts
+        except OSError:
+            pass  # journal absent ou illisible (l'utilisateur videotheque doit être dans le groupe adm)
+    return seen
+
+
+def expire_demand(cid, keep_ids, days, seen):
+    """Efface les vidéos d'une chaîne « demand » non regardées depuis `days` jours
+    (sauf les `keep` plus récentes). Retourne le nombre de vidéos effacées."""
+    limit = time.time() - days * 86400
+    removed = []
+    for mp4 in glob.glob(f"{MEDIA}/{cid}/*_*.mp4"):
+        vid = os.path.basename(mp4)[:-4].split("_", 1)[1]
+        if vid in keep_ids:
+            continue
+        last = max(seen.get(vid, 0), os.path.getmtime(mp4))
+        if last < limit:
+            stem = mp4[:-4]
+            for ext in (".mp4", ".info.json", ".jpg"):
+                try:
+                    os.remove(stem + ext)
+                except OSError:
+                    pass
+            removed.append(vid)
+    if removed:
+        try:
+            with open(ARCHIVE) as f:
+                lines = [l for l in f if l.split()[-1:] and l.split()[-1] not in removed]
+            with open(ARCHIVE + ".tmp", "w") as f:
+                f.writelines(lines)
+            os.replace(ARCHIVE + ".tmp", ARCHIVE)
+        except OSError:
+            pass
+    return len(removed)
+
+
+# ---------------------------------------------------------------- catalogue du site
+
 def slim_info(path):
     """Les .info.json de yt-dlp pèsent des centaines de Ko : on ne garde que l'utile."""
     j = load_json(path, None)
@@ -183,41 +283,62 @@ def slim_info(path):
     return keep
 
 
-def build_library(chs, urls):
-    channels, videos = [], []
-    for url in urls:
-        c = chs.get(url)
-        if not c or not c.get("id"):
+def downloaded(cid):
+    """Vidéos copiées d'une chaîne : {id: entrée du catalogue du site}."""
+    d = f"{MEDIA}/{cid}"
+    out = {}
+    for name in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        if not name.endswith(".info.json"):
             continue
-        d = f"{MEDIA}/{c['id']}"
-        n = 0
-        for name in sorted(os.listdir(d)) if os.path.isdir(d) else []:
-            if not name.endswith(".info.json"):
-                continue
-            stem = name[:-len(".info.json")]
-            if not os.path.exists(f"{d}/{stem}.mp4"):
-                continue
-            j = slim_info(f"{d}/{name}")
-            if not j:
-                continue
-            videos.append({
-                "id": j["id"], "c": c["id"], "t": j.get("title") or "", "d": j.get("upload_date") or "",
-                "l": int(j.get("duration") or 0), "s": (j.get("description") or "")[:DESC_MAX],
-                "th": f"media/{c['id']}/{stem}.jpg" if os.path.exists(f"{d}/{stem}.jpg") else "",
-                "f": f"media/{c['id']}/{stem}.mp4",
-                "ch": [x for x in j.get("chapters") or [] if x.get("t") is not None],
-            })
-            n += 1
-        channels.append({
-            "id": c["id"], "name": c.get("name", c["id"]), "handle": c.get("handle", ""), "desc": c.get("desc", ""),
-            "avatar": f"media/{c['id']}/avatar.jpg" if os.path.exists(f"{d}/avatar.jpg") else "",
-            "banner": f"media/{c['id']}/banner.jpg" if os.path.exists(f"{d}/banner.jpg") else "",
-            "n": n, "complete": c.get("complete", False),
+        stem = name[:-len(".info.json")]
+        if not os.path.exists(f"{d}/{stem}.mp4"):
+            continue
+        j = slim_info(f"{d}/{name}")
+        if not j:
+            continue
+        out[j["id"]] = {
+            "id": j["id"], "c": cid, "t": j.get("title") or "", "d": j.get("upload_date") or "",
+            "l": int(j.get("duration") or 0), "s": (j.get("description") or "")[:DESC_MAX],
+            "th": f"media/{cid}/{stem}.jpg" if os.path.exists(f"{d}/{stem}.jpg") else "",
+            "f": f"media/{cid}/{stem}.mp4",
+            "ch": [x for x in j.get("chapters") or [] if x.get("t") is not None],
+        }
+    return out
+
+
+def build_library(chs, channels):
+    """Vidéos rangées chaîne par chaîne : par date (mode complet) ou dans l'ordre du catalogue
+    YouTube, du plus récent au plus ancien (mode demand)."""
+    out_ch, videos = [], []
+    for c in channels:
+        info = chs.get(c["url"])
+        if not info or not info.get("id"):
+            continue
+        cid = info["id"]
+        d = f"{MEDIA}/{cid}"
+        have = downloaded(cid)
+        if c["mode"] == "demand":
+            vids = []
+            for e in load_json(f"{d}/catalog.json", []):
+                v = have.pop(e["id"], None) or {
+                    "id": e["id"], "c": cid, "t": e["t"], "d": "", "l": e["l"], "s": "", "f": "", "ch": [],
+                    "th": f"media/{cid}/thumbs/{e['id']}.jpg" if os.path.exists(f"{d}/thumbs/{e['id']}.jpg") else ""}
+                v["dm"] = 1
+                vids.append(v)
+            vids += [dict(v, dm=1) for v in have.values()]   # copiées mais plus au catalogue
+        else:
+            vids = sorted(have.values(), key=lambda v: (v["d"], v["id"]), reverse=True)
+        videos += vids
+        out_ch.append({
+            "id": cid, "name": info.get("name", cid), "handle": info.get("handle", ""), "desc": info.get("desc", ""),
+            "avatar": f"media/{cid}/avatar.jpg" if os.path.exists(f"{d}/avatar.jpg") else "",
+            "banner": f"media/{cid}/banner.jpg" if os.path.exists(f"{d}/banner.jpg") else "",
+            "n": len(vids), "local": sum(1 for v in vids if v["f"]),
+            "mode": c["mode"], "complete": info.get("complete", False) or c["mode"] == "demand",
         })
-    videos.sort(key=lambda v: (v["d"], v["id"]), reverse=True)
     save_json(LIBRARY, {"generated": dt.datetime.now().isoformat(timespec="seconds"),
-                        "channels": channels, "videos": videos}, compact=True)
-    return channels, videos
+                        "channels": out_ch, "videos": videos}, compact=True)
+    return out_ch, videos
 
 
 def main():
@@ -233,55 +354,86 @@ def main():
     cfg = settings()
     if "--max" in sys.argv:
         cfg["max"] = int(sys.argv[sys.argv.index("--max") + 1])
-    urls = read_channels()
+    conf = sys.argv[sys.argv.index("--conf") + 1] if "--conf" in sys.argv else CHANNELS_CONF
+    channels = read_channels(conf)
+    full = [c for c in channels if c["mode"] == "full"]
+    demand = [c for c in channels if c["mode"] == "demand"]
     state = load_json(STATE, {"channels": {}})
     chs = state.setdefault("channels", {})
-    status = {"start": dt.datetime.now().isoformat(timespec="seconds"), "ok": True, "new": 0, "errors": []}
+    status = {"start": dt.datetime.now().isoformat(timespec="seconds"), "ok": True, "new": 0,
+              "expired": 0, "errors": []}
+    name = lambda c: chs.get(c["url"], {}).get("name", c["url"])
 
     if "--index-only" not in sys.argv:
         deadline = time.time() + cfg["hours"] * 3600
         budget = cfg["max"]
-        log(f"début : {len(urls)} chaîne(s), budget {budget} vidéos, {cfg['hours']} h max, {cfg['height']}p")
-        for url in urls:
-            chs[url] = channel_info(url, chs) or chs.get(url, {})
+        log(f"début : {len(full)} chaîne(s) complète(s), {len(demand)} à la demande, budget {budget} vidéos, "
+            f"{cfg['hours']} h max, {cfg['height']}p")
+        for c in channels:
+            chs[c["url"]] = channel_info(c["url"], chs) or chs.get(c["url"], {})
         save_json(STATE, state)
 
-        # 1) nouveautés
-        for url in urls:
-            if budget <= 0:
-                break
-            log(f"nouveautés : {chs[url].get('name', url)}")
-            new, _, fatal = download(url, min(budget, NEW_PER_CHANNEL), deadline, True, cfg["height"])
+        # mode demand : catalogue + `keep` plus récentes + ménage
+        seen = views_from_nginx(state) if demand else {}
+        for c in demand:
+            cid = chs[c["url"]].get("id")
+            if not cid:
+                continue
+            log(f"à la demande : {name(c)} (garder {c['keep']}, effacer après {c['expire']} j)")
+            try:
+                update_catalog(c["url"], cid, deadline)
+            except Exception as e:
+                status["errors"].append(f"{name(c)}: catalogue: {e}"[:300])
+                continue
+            new, _, fatal = download(c["url"], min(budget, c["keep"]), deadline, False, cfg["height"],
+                                     items=f"1:{c['keep']}")
             budget -= new
             status["new"] += new
             if fatal:
-                status["errors"].append(f"{chs[url].get('name', url)}: {fatal}")
+                status["errors"].append(f"{name(c)}: {fatal}")
+            keep_ids = {e["id"] for e in load_json(f"{MEDIA}/{cid}/catalog.json", [])[:c["keep"]]}
+            n = expire_demand(cid, keep_ids, c["expire"], seen)
+            status["expired"] += n
+            if n:
+                log(f"  {n} vidéo(s) non regardée(s) depuis {c['expire']} j effacée(s)")
 
-        # 2) rattrapage : chaînes incomplètes, ou toutes le dimanche
+        # mode complet 1) nouveautés
+        for c in full:
+            if budget <= 0:
+                break
+            log(f"nouveautés : {name(c)}")
+            new, _, fatal = download(c["url"], min(budget, NEW_PER_CHANNEL), deadline, True, cfg["height"])
+            budget -= new
+            status["new"] += new
+            if fatal:
+                status["errors"].append(f"{name(c)}: {fatal}")
+
+        # mode complet 2) rattrapage : chaînes incomplètes, ou toutes le dimanche
         sunday = dt.date.today().weekday() == 6
-        todo = [u for u in urls if sunday or not chs[u].get("complete")]
-        for i, url in enumerate(todo):
+        todo = [c for c in full if sunday or not chs[c["url"]].get("complete")]
+        for i, c in enumerate(todo):
             if budget <= 0 or time.time() >= deadline:
                 break
             share = max(1, budget // (len(todo) - i))
-            log(f"rattrapage : {chs[url].get('name', url)} (jusqu'à {share})")
-            new, finished, fatal = download(url, share, deadline, False, cfg["height"])
+            log(f"rattrapage : {name(c)} (jusqu'à {share})")
+            new, finished, fatal = download(c["url"], share, deadline, False, cfg["height"])
             budget -= new
             status["new"] += new
             if finished and not fatal:
-                if not chs[url].get("complete"):
-                    log(f"  chaîne complète : {chs[url].get('name', url)}")
-                chs[url]["complete"] = True
+                if not chs[c["url"]].get("complete"):
+                    log(f"  chaîne complète : {name(c)}")
+                chs[c["url"]]["complete"] = True
             if fatal:
-                status["errors"].append(f"{chs[url].get('name', url)}: {fatal}")
+                status["errors"].append(f"{name(c)}: {fatal}")
         save_json(STATE, state)
 
-    channels, videos = build_library(chs, urls)
+    out_ch, videos = build_library(chs, channels)
     status.update({"end": dt.datetime.now().isoformat(timespec="seconds"),
                    "ok": not status["errors"], "total": len(videos),
-                   "channels": {c["name"]: {"videos": c["n"], "complete": c["complete"]} for c in channels}})
+                   "channels": {c["name"]: {"videos": c["n"], "local": c["local"], "mode": c["mode"],
+                                            "complete": c["complete"]} for c in out_ch}})
     save_json(STATUS, status)
-    log(f"fin : {status['new']} nouvelle(s) vidéo(s), {len(videos)} au total, "
+    log(f"fin : {status['new']} nouvelle(s) vidéo(s), {status['expired']} effacée(s), {len(videos)} au catalogue, "
         f"{'OK' if status['ok'] else 'ERREURS: ' + ' | '.join(status['errors'])}")
     return 0 if status["ok"] else 1
 

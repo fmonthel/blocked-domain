@@ -96,9 +96,11 @@ deploy bind/named.conf.options           /etc/bind/named.conf.options          6
 
 # Video Library (videotheque/): only on servers prepared for it (/etc/videotheque/enabled, nicomaque).
 # Other servers ignore these files.
-RELOAD_NGINX=0; RELOAD_F2B=0
+RELOAD_NGINX=0; RELOAD_F2B=0; RESTART_DEMANDE=0; RELOAD_SYSTEMD=0
 if [ -f /etc/videotheque/enabled ]; then
     deploy videotheque/vt-sync.py              /opt/videotheque/vt-sync.py                644 check_py
+    deploy videotheque/vt-demande.py           /opt/videotheque/vt-demande.py             644 check_py && RESTART_DEMANDE=1
+    deploy videotheque/videotheque-demande.service /etc/systemd/system/videotheque-demande.service 644 check_none && RELOAD_SYSTEMD=1
     deploy videotheque/vt-trusted.sh           /opt/videotheque/vt-trusted.sh             755 check_bash
     deploy videotheque/chaines.conf            /opt/videotheque/chaines.conf              644 check_none
     deploy videotheque/videotheque.cron        /etc/cron.d/videotheque                    644 check_none
@@ -140,6 +142,16 @@ if [ $RELOAD_NGINX -eq 1 ]; then
         f=/etc/nginx/sites-available/videotheque
         [ -f "$f.prev" ] && cp -p "$f.prev" "$f" || rm -f "$f"
         nginx -t >/dev/null 2>&1 && systemctl reload nginx
+        ERRORS=$((ERRORS + 1))
+    fi
+fi
+if [ $RELOAD_SYSTEMD -eq 1 ] || [ $RESTART_DEMANDE -eq 1 ]; then
+    [ $RELOAD_SYSTEMD -eq 1 ] && systemctl daemon-reload && systemctl enable -q videotheque-demande
+    systemctl restart videotheque-demande; sleep 2
+    if systemctl is-active --quiet videotheque-demande; then
+        log "videotheque-demande restarted OK"
+    else
+        log "videotheque-demande not running after restart"
         ERRORS=$((ERRORS + 1))
     fi
 fi

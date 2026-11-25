@@ -1,0 +1,22 @@
+# /etc/systemd/system/videotheque-demande.service - installé par sync-from-github.sh
+# (si /etc/videotheque/enabled existe). Téléchargement à la demande des chaînes « mode=demand ».
+[Unit]
+Description=Videotheque - telechargement a la demande
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=videotheque
+Group=videotheque
+ExecStart=/usr/bin/python3 -B /opt/videotheque/vt-demande.py
+Environment=XDG_CACHE_HOME=/srv/videotheque/.cache
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/srv/videotheque
+
+[Install]
+WantedBy=multi-user.target

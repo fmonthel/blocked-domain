@@ -8,6 +8,8 @@
 # - Squid / BIND are reloaded only when their files changed; if Squid fails to come back,
 #   the previous files are restored.
 # - The blocklist itself is handled by update-squid-blocklist.sh (hourly).
+# - Video Library files (videotheque/) are deployed only where /etc/videotheque/enabled exists;
+#   nginx is checked (nginx -t) and the previous site config restored if it is invalid.
 #
 # install: /root/squid/sync-from-github.sh (chmod 755)
 # usage:   sync-from-github.sh [--dry-run] [--force]
@@ -91,6 +93,20 @@ deploy scripts/sync-from-github.sh       /root/squid/sync-from-github.sh       7
 deploy scripts/squid-proxy.cron          /etc/cron.d/squid-proxy               644 check_none
 deploy bind/named.conf.options           /etc/bind/named.conf.options          644 check_named && RELOAD_NAMED=1
 
+# Video Library (videotheque/): only on servers prepared for it (/etc/videotheque/enabled, nicomaque).
+# Other servers ignore these files.
+RELOAD_NGINX=0
+if [ -f /etc/videotheque/enabled ]; then
+    deploy videotheque/vt-sync.py              /opt/videotheque/vt-sync.py                644 check_py
+    deploy videotheque/vt-htpasswd.sh          /opt/videotheque/vt-htpasswd.sh            755 check_bash
+    deploy videotheque/chaines.conf            /opt/videotheque/chaines.conf              644 check_none
+    deploy videotheque/videotheque.cron        /etc/cron.d/videotheque                    644 check_none
+    deploy videotheque/nginx-videotheque.conf  /etc/nginx/sites-available/videotheque     644 check_none && RELOAD_NGINX=1
+    for f in "$TMP"/videotheque/web/*; do
+        [ -f "$f" ] && deploy "videotheque/web/${f##*/}" "/opt/videotheque/web/${f##*/}" 644 check_none
+    done
+fi
+
 # jobs now live in /etc/cron.d/squid-proxy: drop the old copies from root's crontab
 if [ $DRY -eq 0 ] && [ -f /etc/cron.d/squid-proxy ] && crontab -l 2>/dev/null | grep -qE 'update-squid-blocklist|daily-squid-report|sync-from-github'; then
     crontab -l | grep -vE 'update-squid-blocklist|daily-squid-report|sync-from-github' | crontab -
@@ -108,6 +124,17 @@ if [ $RELOAD_SQUID -eq 1 ]; then
         done
         systemctl restart squid; sleep 5
         systemctl is-active --quiet squid && log "Rollback OK" || log "CRITICAL: Squid not running after rollback"
+        ERRORS=$((ERRORS + 1))
+    fi
+fi
+if [ $RELOAD_NGINX -eq 1 ]; then
+    if nginx -t >/dev/null 2>&1 && systemctl reload nginx; then
+        log "nginx reloaded OK"
+    else
+        log "nginx config invalid, restoring previous videotheque site"
+        f=/etc/nginx/sites-available/videotheque
+        [ -f "$f.prev" ] && cp -p "$f.prev" "$f" || rm -f "$f"
+        nginx -t >/dev/null 2>&1 && systemctl reload nginx
         ERRORS=$((ERRORS + 1))
     fi
 fi

@@ -460,6 +460,8 @@ sites.google.com
 .duckmath.org
 .slope3.com
 .tsnowrider.github.io
+# GitLab Pages unblocked-games mirror ("Drive Mad - Unblocked Games", ubg01.gitlab.io/game/drive-mad.html) spotted on screen, blocked on parent request (2026-11-26); only this subdomain, not gitlab.io
+.ubg01.gitlab.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games

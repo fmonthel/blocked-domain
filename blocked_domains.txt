@@ -462,6 +462,9 @@ sites.google.com
 .tsnowrider.github.io
 # GitLab Pages unblocked-games mirror ("Drive Mad - Unblocked Games", ubg01.gitlab.io/game/drive-mad.html) spotted on screen, blocked on parent request (2026-11-26); only this subdomain, not gitlab.io
 .ubg01.gitlab.io
+# Unblocked-games mirror / browser-games portal seen in proxy report 2026-11-26: UBG 235 Cloudflare Pages mirror (Antoine 15:02-16:54 Chrome, Timothé 09:59-15:21 Chrome/Edge, alongside ubg01.gitlab.io; only this subdomain, not pages.dev), BrainPlay games portal (Timothé, 13:20-13:27, Edge, amid blocked hoodamath / poki attempts)
+.ubg235.pages.dev
+.brainplay.com
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
@@ -495,6 +498,9 @@ sites.google.com
 # Snow Rider 3D browser game sites seen in proxy report 2026-11-23 (Timothé, 16:32-16:39, Chrome)
 .snow-rider.io
 .snow-rider3d.io
+# Browser .io games seen in proxy report 2026-11-26 (Antoine, Chrome, during the ubg01.gitlab.io / ubg235.pages.dev session): EvoWorld.io 15:05-15:07, YoHoHo.io 15:02
+.evoworld.io
+.yohoho.io
 
 # ---------------------------------------------------------------------------
 # Games - platforms, launchers and multiplayer services
@@ -614,6 +620,8 @@ copilot.cloud.microsoft
 .grammarly.io
 # French AI chatbot aggregator seen in proxy report 2026-11-22 (Timothé, 10:37, Chrome, same day as blocked gemini.google.com / claude.ai / chatgpt.com attempts)
 .yiaho.com
+# AI video generator (AI avatars) seen in proxy report 2026-11-26 (Timothé, 14:34-15:01, Edge, 30 accesses)
+.synthesia.io
 
 # ---------------------------------------------------------------------------
 # Other (from previous list)

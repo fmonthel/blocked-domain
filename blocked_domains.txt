@@ -465,6 +465,10 @@ sites.google.com
 # Unblocked-games mirror / browser-games portal seen in proxy report 2026-11-26: UBG 235 Cloudflare Pages mirror (Antoine 15:02-16:54 Chrome, Timothé 09:59-15:21 Chrome/Edge, alongside ubg01.gitlab.io; only this subdomain, not pages.dev), BrainPlay games portal (Timothé, 13:20-13:27, Edge, amid blocked hoodamath / poki attempts)
 .ubg235.pages.dev
 .brainplay.com
+# Browser games / unblocked-games mirror seen in proxy report 2026-11-27 (Antoine, Chrome, amid ~80 blocked ubghyper.github.io and poki attempts): Drive Mad official site 14:35-15:11 (59 accesses), Ragdoll Hit 13:52-15:17, "Unblocked Games for School" GitHub Pages mirror 13:45 (only this subdomain, not github.io)
+.drivemad.com
+.ragdollhit.com
+.funny-school.github.io
 
 # ---------------------------------------------------------------------------
 # Games - .io multiplayer games
